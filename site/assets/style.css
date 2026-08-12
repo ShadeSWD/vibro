@@ -220,6 +220,9 @@ svg.anim{width:100%;height:auto;display:block;background:#fff;border:1px solid v
 .legend .sw{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:5px}
 .verified{margin-top:30px;font:12.5px system-ui,sans-serif;color:var(--muted)}
 
+/* выключные формулы KaTeX прокручиваются внутри себя, а не растягивают страницу */
+.katex-display { overflow-x: auto; overflow-y: hidden; padding: 2px 0; }
+
 /* ==== задачи с разбором ==== */
 .problist{padding-left:26px;max-width:70em}
 .problist li{margin:5px 0}
@@ -240,8 +243,10 @@ svg.anim{width:100%;height:auto;display:block;background:#fff;border:1px solid v
   padding:9px 15px;margin:10px 0;font-size:15px;line-height:1.62;max-width:66em}
 
 /* ==== таблицы норм ==== */
-table.norm{border-collapse:collapse;margin:14px 0;font-size:15px;
-  background:var(--paper);display:block;overflow-x:auto;max-width:100%}
+/* широкие таблицы прокручиваются внутри себя; contain:paint не даёт им
+   растягивать документ по горизонтали на узких экранах */
+.tablewrap{overflow-x:auto;max-width:100%;margin:14px 0;contain:paint}
+table.norm{border-collapse:collapse;margin:0;font-size:15px;background:var(--paper)}
 table.norm th,table.norm td{border:1px solid var(--line);padding:6px 12px;text-align:left}
 table.norm th{background:var(--chip);font-weight:600;font-size:14.5px}
 table.norm td.hi{background:#fbe7e5;font-weight:700;text-align:center}

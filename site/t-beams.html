@@ -51,7 +51,7 @@
   <div class="formula">$$W(x) = A\sin kx + B\cos kx + C\operatorname{sh} kx + D\operatorname{ch} kx .$$</div>
   <p>Четыре постоянных определяются четырьмя граничными условиями (по два на каждом
   конце):</p>
-  <table style="border-collapse:collapse;margin:12px 0;font-size:15px">
+  <div class="tablewrap"><table style="border-collapse:collapse;margin:12px 0;font-size:15px">
     <tr style="border-bottom:1px solid #d8d6cf"><th style="padding:4px 14px;text-align:left">закрепление конца</th>
       <th style="padding:4px 14px;text-align:left">условия</th><th style="padding:4px 14px;text-align:left">смысл</th></tr>
     <tr style="border-bottom:1px solid #d8d6cf"><td style="padding:4px 14px">шарнирная опора</td>
@@ -60,7 +60,7 @@
       <td style="padding:4px 14px">\(W = 0,\ W' = 0\)</td><td style="padding:4px 14px">нет прогиба и поворота</td></tr>
     <tr><td style="padding:4px 14px">свободный конец</td>
       <td style="padding:4px 14px">\(W'' = 0,\ W''' = 0\)</td><td style="padding:4px 14px">нет момента и перерезывающей силы</td></tr>
-  </table>
+  </table></div>
   <p>Однородная система четырёх уравнений имеет ненулевое решение только при равенстве
   нулю её определителя — это <b>частотное уравнение</b> относительно безразмерного
   параметра \(\mu = kl\); каждому корню \(\mu_n\) отвечают частота и форма:</p>
@@ -90,30 +90,66 @@
   получаются трансцендентными. Для <b>консоли</b> (заделка — свободный конец; кронштейн,
   мачта) раскрытие определителя даёт \(1 + \cos\mu\operatorname{ch}\mu = 0\); для
   <b>свободной балки</b> (оба конца свободны — это корпус судна на воде!) —
-  \(\cos\mu\operatorname{ch}\mu = 1\). Сводка низших корней:</p>
-  <table style="border-collapse:collapse;margin:12px 0;font-size:15px">
-    <tr style="border-bottom:1px solid #d8d6cf"><th style="padding:4px 12px;text-align:left">закрепление</th>
-      <th style="padding:4px 12px;text-align:left">частотное уравнение</th>
-      <th style="padding:4px 12px">μ₁</th><th style="padding:4px 12px">μ₂</th><th style="padding:4px 12px">μ₃</th></tr>
-    <tr style="border-bottom:1px solid #d8d6cf"><td style="padding:4px 12px">шарнир — шарнир</td>
-      <td style="padding:4px 12px">\(\sin\mu = 0\)</td>
-      <td style="padding:4px 12px">π = 3,142</td><td style="padding:4px 12px">2π = 6,283</td><td style="padding:4px 12px">3π = 9,425</td></tr>
-    <tr style="border-bottom:1px solid #d8d6cf"><td style="padding:4px 12px">заделка — свободный (консоль)</td>
-      <td style="padding:4px 12px">\(\cos\mu\operatorname{ch}\mu = -1\)</td>
-      <td style="padding:4px 12px">1,875</td><td style="padding:4px 12px">4,694</td><td style="padding:4px 12px">7,855</td></tr>
-    <tr style="border-bottom:1px solid #d8d6cf"><td style="padding:4px 12px">заделка — шарнир</td>
-      <td style="padding:4px 12px">\(\operatorname{tg}\mu = \operatorname{th}\mu\)</td>
-      <td style="padding:4px 12px">3,927</td><td style="padding:4px 12px">7,069</td><td style="padding:4px 12px">10,210</td></tr>
-    <tr style="border-bottom:1px solid #d8d6cf"><td style="padding:4px 12px">заделка — заделка</td>
-      <td style="padding:4px 12px">\(\cos\mu\operatorname{ch}\mu = 1\)</td>
-      <td style="padding:4px 12px">4,730</td><td style="padding:4px 12px">7,853</td><td style="padding:4px 12px">10,996</td></tr>
-    <tr><td style="padding:4px 12px">свободный — свободный (корпус)</td>
-      <td style="padding:4px 12px">\(\cos\mu\operatorname{ch}\mu = 1\)</td>
-      <td style="padding:4px 12px">4,730</td><td style="padding:4px 12px">7,853</td><td style="padding:4px 12px">10,996</td></tr>
-  </table>
-  <p>Заделка — заделка и свободная балка имеют одинаковый спектр, но разные формы: у
-  свободной балки к упругой форме добавляются перемещения её как жёсткого тела, а сами
-  формы имеют минимум два узла (<a href="t-energy#hull">глава 6</a>).</p>
+  \(\cos\mu\operatorname{ch}\mu = 1\).</p>
+  <p>Поскольку \(\lambda_n = \dfrac{\mu_n^{2}}{l^{2}}\sqrt{\dfrac{EI}{m}}\), в частоту
+  входит <b>квадрат</b> корня — его и называют частотным коэффициентом. Сводная таблица
+  (последняя колонка — во сколько раз частота выше, чем у шарнирно опёртой балки того же
+  пролёта):</p>
+  <div class="tablewrap"><table class="norm">
+    <tr><th>закрепление</th><th>частотное уравнение</th>
+      <th>μ₁</th><th>μ₁²</th><th>μ₂</th><th>μ₃</th>
+      <th>μ<sub>n</sub> при больших n</th><th>λ₁ / λ₁<sup>ш-ш</sup></th></tr>
+    <tr><td>шарнир — шарнир<br><span class="muted">простая балка набора</span></td>
+      <td>\(\sin\mu = 0\)</td>
+      <td>3,142</td><td>9,870</td><td>6,283</td><td>9,425</td>
+      <td>\(\pi n\)</td><td><b>1,000</b></td></tr>
+    <tr><td>заделка — свободный (консоль)<br><span class="muted">мачта, кронштейн</span></td>
+      <td>\(\cos\mu\operatorname{ch}\mu = -1\)</td>
+      <td>1,875</td><td>3,516</td><td>4,694</td><td>7,855</td>
+      <td>\(\dfrac{(2n-1)\pi}{2}\)</td><td><b>0,356</b></td></tr>
+    <tr><td>заделка — шарнир<br><span class="muted">приваренный к рамной связи бимс</span></td>
+      <td>\(\operatorname{tg}\mu = \operatorname{th}\mu\)</td>
+      <td>3,927</td><td>15,42</td><td>7,069</td><td>10,210</td>
+      <td>\(\dfrac{(4n+1)\pi}{4}\)</td><td><b>1,562</b></td></tr>
+    <tr><td>заделка — заделка<br><span class="muted">пролёт неразрезной балки</span></td>
+      <td>\(\cos\mu\operatorname{ch}\mu = 1\)</td>
+      <td>4,730</td><td>22,37</td><td>7,853</td><td>10,996</td>
+      <td>\(\dfrac{(2n+1)\pi}{2}\)</td><td><b>2,267</b></td></tr>
+    <tr><td>свободный — свободный<br><span class="muted">корпус судна на воде</span></td>
+      <td>\(\cos\mu\operatorname{ch}\mu = 1\)</td>
+      <td>4,730</td><td>22,37</td><td>7,853</td><td>10,996</td>
+      <td>\(\dfrac{(2n+1)\pi}{2}\)</td><td><b>2,267</b></td></tr>
+  </table></div>
+  <p class="small">Все корни в таблице решаются заново прямо в браузере (деление отрезка
+  пополам) и сверяются с напечатанными — см. консоль, <code>[selfcheck t-beams]</code>.</p>
+  <p>Как читать таблицу:</p>
+  <ul>
+    <li><b>Разброс огромен.</b> Одна и та же балка при разных закреплениях имеет частоты,
+    отличающиеся в \(22{,}37/3{,}516 = 6{,}4\) раза. Это значит, что в расчёте местной
+    вибрации важнее всего правильно назначить <b>расчётную схему</b>, а не уточнять
+    момент инерции (<a href="problems#p13">задача 13</a>).</li>
+    <li><b>Асимптотика точна почти сразу.</b> Начиная со второго-третьего тона корни
+    ложатся на простые формулы правой колонки с точностью до третьего знака: например,
+    для консоли \(\mu_3 = 7{,}855\) против \(5\pi/2 = 7{,}854\). Причина: с ростом μ
+    \(\operatorname{ch}\mu\) и \(\operatorname{sh}\mu\) растут экспоненциально, гиперболические
+    члены вытесняют друг друга, и уравнение вырождается в \(\cos\mu = 0\) или
+    \(\operatorname{tg}\mu = 1\). Для схемы «заделка — шарнир» формула
+    \((4n+1)\pi/4\) практически точна уже для первого корня.</li>
+    <li><b>Заделка — заделка и свободная балка имеют одинаковый спектр</b>, но разные
+    формы: у свободной балки к упругой форме добавляются перемещения её как жёсткого
+    тела, а сами формы имеют минимум два узла (<a href="t-energy#hull">глава 6</a>).
+    Совпадение не случайно: обе задачи описываются одним и тем же определителем — условия
+    \(W = W' = 0\) и \(W'' = W''' = 0\) входят в него симметрично.</li>
+    <li><b>Промежуточные случаи.</b> Реальное закрепление судовой балки — упругое
+    защемление, поэтому истинный корень лежит <i>между</i> табличными: для бимса —
+    между 3,142 (шарнир) и 4,730 (заделка). Если проверяется отстройка «снизу», в запас
+    идёт шарнирная схема.</li>
+  </ul>
+  <div class="panel" style="max-width:760px">
+    <svg viewBox="0 0 720 260" class="anim" id="svgCoef"></svg>
+    <div class="caption">Частотные коэффициенты μ₁² для разных закреплений: одна и та же
+    балка, разница по частоте — в 6,4 раза.</div>
+  </div>
   <div class="panel" style="max-width:760px">
     <svg viewBox="0 0 720 250" class="anim" id="svgCant"></svg>
     <div class="caption">Первые формы консоли (слева, μ₁ = 1,875; μ₂ = 4,694) и свободной
@@ -277,6 +313,81 @@
         pl.setAttribute('points', pts.join(' '));
       });
     });
+  }
+
+  /* --- 4.4 диаграмма частотных коэффициентов + проверка корней --- */
+  {
+    const svg = document.getElementById('svgCoef');
+    const x0 = 210, y0 = 26, w = 430, h = 200, cmax = 25;
+    const rows = [
+      { name: 'консоль', sub: 'заделка — свободный', c: 3.516, col: '#1a7f37' },
+      { name: 'шарнир — шарнир', sub: 'эталон сравнения', c: 9.870, col: '#155e75' },
+      { name: 'заделка — шарнир', sub: '', c: 15.42, col: '#c98a1e' },
+      { name: 'заделка — заделка', sub: 'и свободная балка', c: 22.37, col: '#b3382e' },
+    ];
+    const bh = h / rows.length;
+    V.el('line', { x1: x0, y1: y0, x2: x0, y2: y0 + h, stroke: '#16161a' }, svg);
+    rows.forEach((r, i) => {
+      const y = y0 + bh * i + 8, hh = bh - 18;
+      V.el('rect', { x: x0, y, width: r.c / cmax * w, height: hh, rx: 3,
+        fill: r.col, opacity: 0.22, stroke: r.col, 'stroke-width': 1.4 }, svg);
+      V.el('text', { x: x0 - 10, y: y + hh / 2 + 5, 'text-anchor': 'end', class: 'lbl', 'font-size': 13.5 }, svg)
+        .textContent = r.name;
+      if (r.sub) V.el('text', { x: x0 - 10, y: y + hh / 2 + 19, 'text-anchor': 'end', class: 'lbl', 'font-size': 11.5, fill: '#9a9aa2' }, svg)
+        .textContent = r.sub;
+      V.el('text', { x: x0 + r.c / cmax * w + 8, y: y + hh / 2 + 5, class: 'lbl', fill: r.col, 'font-size': 13.5 }, svg)
+        .textContent = `μ₁² = ${V.fmt(r.c, 2)}   (×${V.fmt(r.c / 9.8696, 2)})`;
+    });
+    V.el('text', { x: x0, y: y0 + h + 22, class: 'lbl', 'font-size': 13, fill: '#6b6b74' }, svg)
+      .textContent = 'λ₁ = μ₁²/l² · √(EI/m) — длина в скобках даёт отношение к шарнирной балке';
+
+    /* численное решение частотных уравнений и сверка с таблицей */
+    const bisect = (f, a, b) => {
+      let fa = f(a);
+      for (let i = 0; i < 200; i++) {
+        const m = (a + b) / 2, fm = f(m);
+        if (fa * fm <= 0) b = m; else { a = m; fa = fm; }
+      }
+      return (a + b) / 2;
+    };
+    const findRoots = (f, from, to, k) => {
+      const out = []; const st = 0.002;
+      for (let x = from; x < to && out.length < k; x += st) {
+        const fa = f(x), fb = f(x + st);
+        if (fa * fb < 0 && Math.abs(fa) < 1e8 && Math.abs(fb) < 1e8) {
+          const r = bisect(f, x, x + st);
+          if (!out.length || r - out[out.length - 1] > 0.5) out.push(r);
+        }
+      }
+      return out;
+    };
+    const ch = Math.cosh, sh = Math.sinh;
+    const cant = findRoots((m) => 1 + Math.cos(m) * ch(m), 0.6, 13, 3);
+    // «заделка — шарнир» в форме без полюсов тангенса
+    const fixPin = findRoots((m) => Math.sin(m) * ch(m) - Math.cos(m) * sh(m), 0.6, 13, 3);
+    const fixFix = findRoots((m) => Math.cos(m) * ch(m) - 1, 0.6, 13, 3);
+    V.selfcheck('t-beams', [
+      ['консоль μ₁', cant[0], 1.875, 5e-4],
+      ['консоль μ₂', cant[1], 4.694, 5e-4],
+      ['консоль μ₃', cant[2], 7.855, 5e-4],
+      ['консоль μ₁²', cant[0] ** 2, 3.516, 5e-3],
+      ['заделка-шарнир μ₁', fixPin[0], 3.927, 5e-4],
+      ['заделка-шарнир μ₂', fixPin[1], 7.069, 5e-4],
+      ['заделка-шарнир μ₃', fixPin[2], 10.210, 5e-4],
+      ['заделка-шарнир μ₁²', fixPin[0] ** 2, 15.42, 5e-3],
+      ['заделка-заделка μ₁', fixFix[0], 4.730, 5e-4],
+      ['заделка-заделка μ₂', fixFix[1], 7.853, 5e-4],
+      ['заделка-заделка μ₃', fixFix[2], 10.996, 5e-4],
+      ['заделка-заделка μ₁²', fixFix[0] ** 2, 22.37, 5e-3],
+      ['шарнир μ₁²', Math.PI ** 2, 9.870, 5e-3],
+      ['отношение консоль/шарнир', cant[0] ** 2 / Math.PI ** 2, 0.356, 5e-4],
+      ['отношение зад-шарнир/шарнир', fixPin[0] ** 2 / Math.PI ** 2, 1.562, 5e-4],
+      ['отношение зад-зад/шарнир', fixFix[0] ** 2 / Math.PI ** 2, 2.267, 5e-4],
+      ['разброс частот (макс/мин)', fixFix[0] ** 2 / cant[0] ** 2, 6.4, 5e-2],
+      ['асимптотика консоли (2n−1)π/2, n=3', 5 * Math.PI / 2, 7.854, 5e-4],
+      ['асимптотика зад-шарнир (4n+1)π/4, n=1', 5 * Math.PI / 4, 3.927, 5e-4],
+      ['асимптотика зад-зад (2n+1)π/2, n=3', 7 * Math.PI / 2, 10.996, 5e-4],
+    ]);
   }
 
   /* --- 4.4 формы консоли и свободной балки --- */
