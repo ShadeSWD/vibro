@@ -23,6 +23,8 @@
     { href: '', key: 'index', title: 'Обзор' },
     { href: 'theory', key: 'theory', title: 'Теория', drop: chapters },
     { href: 'models', key: 'models', title: 'Модели', drop: models },
+    { href: 'problems', key: 'problems', title: 'Задачи' },
+    { href: 'norms', key: 'norms', title: 'Нормы' },
     { href: 'hull', key: 'hull', title: 'Корпус судна' },
     { href: 'sources', key: 'sources', title: 'Источники' },
   ];

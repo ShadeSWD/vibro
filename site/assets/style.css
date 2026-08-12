@@ -219,3 +219,34 @@ svg.anim{width:100%;height:auto;display:block;background:#fff;border:1px solid v
 .legend{display:flex;gap:14px;flex-wrap:wrap;font:13.5px system-ui,sans-serif;color:var(--muted);margin:6px 0}
 .legend .sw{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:5px}
 .verified{margin-top:30px;font:12.5px system-ui,sans-serif;color:var(--muted)}
+
+/* ==== задачи с разбором ==== */
+.problist{padding-left:26px;max-width:70em}
+.problist li{margin:5px 0}
+.problist .muted{font-size:13.5px}
+.prob{background:var(--paper);border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--shadow);padding:14px 20px 18px;margin:24px 0;scroll-margin-top:70px}
+.prob>h3{margin:0 0 8px;font-size:19px}
+.prob .tag{display:inline-block;font:600 12px system-ui,sans-serif;color:#fff;
+  background:var(--accent2);border-radius:999px;padding:3px 11px;margin-right:9px;
+  vertical-align:2px;letter-spacing:.02em}
+.prob .given{margin:6px 0 12px;max-width:64em}
+.prob svg.anim{margin:12px 0}
+.prob .steps{margin:10px 0}
+.prob .steps .step{margin:9px 0;font-size:15.5px;line-height:1.7;max-width:66em}
+.prob .ans{background:#e6f2ea;border:1px solid #bcdcc6;border-left:4px solid var(--green);
+  border-radius:10px;padding:9px 15px;margin:12px 0;font-size:16px;max-width:66em}
+.prob .concl{background:#fbf7ea;border:1px solid #e7dcb8;border-radius:10px;
+  padding:9px 15px;margin:10px 0;font-size:15px;line-height:1.62;max-width:66em}
+
+/* ==== таблицы норм ==== */
+table.norm{border-collapse:collapse;margin:14px 0;font-size:15px;
+  background:var(--paper);display:block;overflow-x:auto;max-width:100%}
+table.norm th,table.norm td{border:1px solid var(--line);padding:6px 12px;text-align:left}
+table.norm th{background:var(--chip);font-weight:600;font-size:14.5px}
+table.norm td.hi{background:#fbe7e5;font-weight:700;text-align:center}
+table.norm td.lo{background:#e6f2ea;font-weight:700;text-align:center}
+table.norm .muted{font-weight:400;font-size:12.5px}
+table.norm.small-t{font-size:13px}
+table.norm.small-t th,table.norm.small-t td{padding:4px 7px;text-align:right}
+table.norm.small-t th{text-align:left;white-space:nowrap}
