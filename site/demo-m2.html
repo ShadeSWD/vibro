@@ -9,22 +9,22 @@
 </head>
 <body>
 <main class="wrap">
-  <h1>М2. Вынужденные колебания: сила Q₀·sin ωt</h1>
+  <h1>М2. Вынужденные колебания: сила \(Q_0\sin\omega t\)</h1>
   <p class="lead">К той же системе (М1) приложим гармоническую силу:
-  <span class="eq">q̈ + 2μq̇ + λ²q = (Q₀/M)·sin ωt</span>. Сначала виден
+  <span class="eq">\(\ddot{q} + 2\mu\dot{q} + \lambda^2 q = (Q_0/M)\sin\omega t\)</span>. Сначала виден
   <b>переходный процесс</b> (затухающие собственные колебания), затем остаются
   чистые <b>установившиеся</b> колебания с частотой силы и амплитудой
-  <span class="eq">α·Q₀/C</span>. Коэффициент динамичности α — главная кривая всей
+  <span class="eq">\(\alpha\, Q_0/C\)</span>. Коэффициент динамичности α — главная кривая всей
   вибрации: подведите ω к λ и посмотрите на резонанс.</p>
   <p><a class="theory-link" href="theory#t4">Вынужденные колебания и α</a></p>
 
   <div class="panel">
     <div class="boards">
       <div style="flex:0 1 250px"><svg id="mech" class="anim" viewBox="0 0 260 430"></svg>
-        <div class="caption">Красная стрелка — сила Q(t) = Q₀·sin ωt.</div></div>
+        <div class="caption">Красная стрелка — сила \(Q(t) = Q_0\sin\omega t\).</div></div>
       <div style="flex:2 1 420px"><svg id="graph" class="anim" viewBox="0 0 660 430"></svg>
         <div class="legend"><span><span class="sw" style="background:#155e75"></span>полное решение q(t)</span>
-          <span><span class="sw" style="background:#9a9aa2;height:2px"></span>±α·Q₀/C (установившийся размах)</span></div></div>
+          <span><span class="sw" style="background:#9a9aa2;height:2px"></span>\(\pm\alpha\, Q_0/C\) (установившийся размах)</span></div></div>
       <div style="flex:1 1 300px"><svg id="rez" class="anim" viewBox="0 0 360 430"></svg>
         <div class="caption">Резонансная кривая α(ω/λ); точка — текущая настройка. Кривая
         перестраивается при изменении μ.</div></div>
@@ -45,17 +45,17 @@
   <p class="small">Серым — подстановка текущих значений, жирным — результат.</p>
   <div class="steps" id="steps"></div>
 
-  <div class="note tip"><b>Что смотреть.</b> Пик кривой — чуть левее ω/λ = 1 (точный максимум при
-  ω = λ√(1−2μ²/λ²)); высота пика ≈ λ/2μ. При ω ≪ λ груз движется «как статика» (α → 1),
-  при ω ≫ λ — не успевает за силой (α → 0, противофаза). Увеличьте μ — пик оседает: так работает
+  <div class="note tip"><b>Что смотреть.</b> Пик кривой — чуть левее \(\omega/\lambda = 1\) (точный максимум при
+  \(\omega = \lambda\sqrt{1 - 2\mu^2/\lambda^2}\)); высота пика \(\approx \lambda/2\mu\). При \(\omega \ll \lambda\) груз движется «как статика» (\(\alpha \to 1\)),
+  при \(\omega \gg \lambda\) — не успевает за силой (\(\alpha \to 0\), противофаза). Увеличьте μ — пик оседает: так работает
   демпфирование судовых конструкций.</div>
   <div class="note"><b>Примечание.</b> Исходный Mathcad-файл этой модели
   (<code>mass_on_spring_force</code>) остался недописанным — здесь приведено полное решение по
-  теме 4 конспекта: установившаяся часть α·(Q₀/C)·sin(ωt−ε) плюс переходный процесс из нулевых
+  теме 4 конспекта: установившаяся часть \(\alpha\,(Q_0/C)\sin(\omega t - \varepsilon)\) плюс переходный процесс из нулевых
   начальных условий.</div>
 
-  <p class="verified">Самопроверка при дефолтах (M=10, C=1000, μ=1, ω=5): α = 1,321635;
-  амплитуда установившихся 0,132164 м — формулы темы 4 конспекта.</p>
+  <p class="verified">Самопроверка при дефолтах \((M = 10,\ C = 1000,\ \mu = 1,\ \omega = 5)\): \(\alpha = 1{,}321635\);
+  амплитуда установившихся \(0{,}132164\) м — формулы темы 4 конспекта.</p>
 </main>
 <script src="assets/site.js" data-root="./" data-page="demo-m2"></script>
 <script src="assets/vibro.js"></script>

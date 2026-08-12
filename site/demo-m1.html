@@ -13,7 +13,7 @@
   <p class="lead">Груз массой <i>M</i> висит на пружине жёсткостью <i>C</i>; движению мешает
   вязкое сопротивление (коэффициент затухания <i>μ</i>). Оттянем груз на <i>q</i>₀ и толкнём со
   скоростью <i>v</i>₀ — дальше система живёт сама:
-  <span class="eq">q̈ + 2μq̇ + λ²q = 0</span>, где <span class="eq">λ = √(C/M)</span> —
+  <span class="eq">\(\ddot{q} + 2\mu\dot{q} + \lambda^2 q = 0\)</span>, где <span class="eq">\(\lambda = \sqrt{C/M}\)</span> —
   собственная частота. Всё на этой странице пересчитывается ползунками на лету.</p>
   <p><a class="theory-link" href="theory#t2">Свободные колебания</a>
      <a class="theory-link" href="theory#t3">Затухание и декремент</a></p>
@@ -24,7 +24,7 @@
         <div class="caption">Пружина и груз: смещение <i>q</i> положительно вниз.</div></div>
       <div style="flex:2 1 460px"><svg id="graph" class="anim" viewBox="0 0 660 430"></svg>
         <div class="legend"><span><span class="sw" style="background:#155e75"></span><i>q</i>(<i>t</i>)</span>
-          <span><span class="sw" style="background:#9a9aa2;height:2px"></span>огибающая ±<i>A</i>·e<sup>−μt</sup></span></div></div>
+          <span><span class="sw" style="background:#9a9aa2;height:2px"></span>огибающая \(\pm A\,e^{-\mu t}\)</span></div></div>
     </div>
     <div class="controls">
       <label>M, кг <input type="range" id="sM" min="1" max="50" step="0.5" value="10" data-d="1"> <span class="val" data-for="sM"></span></label>
@@ -40,19 +40,19 @@
 
   <h2>Решение по шагам</h2>
   <p class="small">Серым — подстановка текущих значений ползунков, жирным — результат.
-  При значениях по умолчанию (M = 10, C = 1000, μ = 1, q₀ = 0,1, v₀ = 1) числа совпадают
+  При значениях по умолчанию \((M = 10,\ C = 1000,\ \mu = 1,\ q_0 = 0{,}1,\ v_0 = 1)\) числа совпадают
   с Mathcad-моделью <code>mass_on_spring</code>.</p>
   <div class="steps" id="steps"></div>
 
   <div class="note tip" id="noteOsc">
   <b>Что смотреть.</b> Амплитуда гаснет по экспоненте — соседние размахи относятся как
-  e<sup>μT</sup> (логарифмический декремент δ = μT). Затухание почти не меняет частоту:
-  при μ = 1 и λ = 10 частота падает всего до λ′ = 9,95. Сделайте μ² &gt; λ² — колебания
+  \(e^{\mu T}\) (логарифмический декремент \(\delta = \mu T\)). Затухание почти не меняет частоту:
+  при \(\mu = 1\) и \(\lambda = 10\) частота падает всего до \(\lambda' = 9{,}95\). Сделайте \(\mu^2 &gt; \lambda^2\) — колебания
   исчезают вовсе: система апериодически сползает к равновесию (кнопка «Апериодика»).
   </div>
 
-  <p class="verified">Сверено с Mathcad-моделью кафедры (mass_on_spring): λ = 10; λ′ = 9,94987;
-  A = 0,149071; ε = 0,835482.</p>
+  <p class="verified">Сверено с Mathcad-моделью кафедры (mass_on_spring): \(\lambda = 10\); \(\lambda' = 9{,}94987\);
+  \(A = 0{,}149071\); \(\varepsilon = 0{,}835482\).</p>
 </main>
 <script src="assets/site.js" data-root="./" data-page="demo-m1"></script>
 <script src="assets/vibro.js"></script>
