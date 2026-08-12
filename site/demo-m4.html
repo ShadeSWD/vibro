@@ -31,14 +31,14 @@
       <label>f, мм <input type="range" id="sF" min="2" max="15" step="0.5" value="10" data-d="1"> <span class="val" data-for="sF"></span></label>
       <label>L, мм <input type="range" id="sL" min="150" max="350" step="5" value="260" data-d="0"> <span class="val" data-for="sL"></span></label>
       <label>h, мм <input type="range" id="sH" min="0.5" max="2" step="0.1" value="1" data-d="1"> <span class="val" data-for="sH"></span></label>
-      <button class="btn" id="bDef">Дефолт (Mathcad)</button>
+      <button class="btn" id="bDef">Значения по умолчанию</button>
       <span class="badge ok" id="resBadge"></span>
     </div>
   </div>
 
   <h2>Решение по шагам</h2>
   <p class="small">Серым — подстановка текущих значений, жирным — результат. При дефолте
-  (ν = 15 Гц) константы совпадают с Mathcad-моделью <code>console_beam</code>.</p>
+  (ν = 15 Гц) константы совпадают с расчётом кафедры.</p>
   <div class="steps" id="steps"></div>
 
   <div class="note tip"><b>Что смотреть.</b> Ниже первого резонанса (\(\nu &lt; \lambda_1 = 2{,}2\) Гц) линейка
@@ -47,7 +47,7 @@
   заделка и конец колеблются. На шкале частот резонансы отмечены красным; попадёте в них —
   амплитуда (в модели без трения) неограниченно растёт.</div>
 
-  <p class="verified">Сверено с Mathcad-моделью кафедры (console_beam), \(\nu = 15\) Гц: \(\mu = 4{,}891180\);
+  <p class="verified">Сверено с расчётом кафедры, \(\nu = 15\) Гц: \(\mu = 4{,}891180\);
   \(A = 0{,}00409696\); \(B = -0{,}00598006\); \(C = 0{,}00401994\); \(D = -0{,}00409696\); \(\lambda_1 = 2{,}207\) Гц; \(\lambda_2 = 13{,}819\) Гц.</p>
 </main>
 <script src="assets/site.js" data-root="./" data-page="demo-m4"></script>
@@ -69,7 +69,7 @@
     const w = 2 * Math.PI * nu;
     const mu = L * Math.pow(w * w * m / EI, 0.25);
     const s = Math.sin(mu), c = Math.cos(mu), sh = Math.sinh(mu), ch = Math.cosh(mu);
-    // Система 4×4 в точности как в кафедральном console_beam.xmcd (блок Given/Find):
+    // Система 4×4 в точности как в исходном расчёте кафедры:
     // w(0)=f, w'(0)=0, w''(L)=0, w'''(L)=0
     const M = [
       [0, -1, 1, 0],    // w(0) = f
@@ -218,7 +218,7 @@
 
   rebuild();
 
-  { // самопроверка с эталонами Mathcad (дефолт ν = 15 Гц)
+  { // самопроверка с эталонами (дефолт ν = 15 Гц)
     const s = sol;
     V.selfcheck('m4', [
       ['μ', s.mu, 4.891180, 1e-5],

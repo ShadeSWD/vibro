@@ -32,7 +32,7 @@
       <label>μ, 1/с <input type="range" id="sMu" min="0" max="25" step="0.1" value="1" data-d="1"> <span class="val" data-for="sMu"></span></label>
       <label>q₀, м <input type="range" id="sQ0" min="-0.3" max="0.3" step="0.01" value="0.1"> <span class="val" data-for="sQ0"></span></label>
       <label>v₀, м/с <input type="range" id="sV0" min="-3" max="3" step="0.1" value="1" data-d="1"> <span class="val" data-for="sV0"></span></label>
-      <button class="btn" id="bReset">Дефолт (Mathcad)</button>
+      <button class="btn" id="bReset">Значения по умолчанию</button>
       <button class="btn" id="bAper">Апериодика: μ² &gt; λ²</button>
       <span id="regime" class="badge ok">колебательный режим</span>
     </div>
@@ -41,7 +41,7 @@
   <h2>Решение по шагам</h2>
   <p class="small">Серым — подстановка текущих значений ползунков, жирным — результат.
   При значениях по умолчанию \((M = 10,\ C = 1000,\ \mu = 1,\ q_0 = 0{,}1,\ v_0 = 1)\) числа совпадают
-  с Mathcad-моделью <code>mass_on_spring</code>.</p>
+  с расчётом кафедры.</p>
   <div class="steps" id="steps"></div>
 
   <div class="note tip" id="noteOsc">
@@ -51,7 +51,7 @@
   исчезают вовсе: система апериодически сползает к равновесию (кнопка «Апериодика»).
   </div>
 
-  <p class="verified">Сверено с Mathcad-моделью кафедры (mass_on_spring): \(\lambda = 10\); \(\lambda' = 9{,}94987\);
+  <p class="verified">Сверено с расчётом кафедры: \(\lambda = 10\); \(\lambda' = 9{,}94987\);
   \(A = 0{,}149071\); \(\varepsilon = 0{,}835482\).</p>
 </main>
 <script src="assets/site.js" data-root="./" data-page="demo-m1"></script>
@@ -215,7 +215,7 @@
 
   rebuild();
 
-  /* ---------- самопроверка с эталонами Mathcad ---------- */
+  /* ---------- самопроверка с эталонами ---------- */
   {
     const s = sol; // дефолтные параметры
     V.selfcheck('m1', [

@@ -13,7 +13,7 @@
   <p class="lead">Цепочка: к потолку на пружине <i>c</i>₁ подвешена масса <i>m</i>₁, к ней на
   пружине <i>c</i>₂ — масса <i>m</i>₂. У системы <b>две</b> собственные частоты и две формы
   колебаний; любое движение — их сумма. По умолчанию нижней массе сообщён толчок
-  \(v_{20} = 5\) м/с — как в Mathcad-модели <code>two_mass_on_spring</code>.</p>
+  \(v_{20} = 5\) м/с — значения по умолчанию из расчёта кафедры.</p>
   <p><a class="theory-link" href="theory#t5">Системы с n степенями свободы</a>
      <a class="theory-link" href="theory#t6">Динамический гаситель</a></p>
 
@@ -37,14 +37,14 @@
       <button class="btn" id="bF1">Возбудить форму 1</button>
       <button class="btn" id="bF2">Возбудить форму 2</button>
       <button class="btn" id="bBeat">Биения</button>
-      <button class="btn" id="bDef">Дефолт (Mathcad)</button>
+      <button class="btn" id="bDef">Значения по умолчанию</button>
       <span class="badge ok" id="freqBadge"></span>
     </div>
   </div>
 
   <h2>Решение по шагам</h2>
   <p class="small">Серым — подстановка текущих значений, жирным — результат. При дефолте числа
-  совпадают с Mathcad-моделью (собственные числа матрицы, константы A и фазы ε).</p>
+  совпадают с расчётом кафедры.</p>
   <div class="steps" id="steps"></div>
 
   <div class="note tip"><b>Две формы.</b> Кнопка «Форма 1» задаёт начальные отклонения точно по
@@ -60,7 +60,7 @@
   вибрацией мачт, перекрытий и фундаментов механизмов на судах — а наша модель показывает его
   «скелет»: попробуйте форму 2 — верхняя масса почти неподвижна, всё движение забирает нижняя.</div>
 
-  <p class="verified">Сверено с Mathcad-моделью кафедры (two_mass_on_spring): \(\lambda_1 = 2{,}089112\);
+  <p class="verified">Сверено с расчётом кафедры: \(\lambda_1 = 2{,}089112\);
   \(\lambda_2 = 33{,}847239\); \(|A_{11}| = 2{,}0971012\); \(|A_{12}| = 0{,}12943684\); \(|A_{21}| = 2{,}1928037\); \(|A_{22}| = 0{,}012378771\);
   \(\varepsilon_1 = 3\pi\), \(\varepsilon_2 = \pi\).</p>
 </main>
@@ -168,7 +168,7 @@
     <div class="step"><span class="f">Константы из 4 начальных условий (q₁₀=${f(IC.q10, 2)}, q₂₀=${f(IC.q20, 2)}, v₁₀=${f(IC.v10, 2)}, v₂₀=${f(IC.v20, 2)}):</span>
       <span class="res">q₁(t) = ${term(s.a1, s.b1, s.l1)} + ${term(s.a2, s.b2, s.l2)}</span></div>
     <div class="step"><span class="res">q₂(t) = ${term(s.r1 * s.a1, s.r1 * s.b1, s.l1)} + ${term(s.r2 * s.a2, s.r2 * s.b2, s.l2)}</span></div>
-    ${isDefault ? `<div class="step"><span class="cmnt">Форма записи Mathcad: qᵢ(t) = Aᵢ₁·sin(λ₁t+ε₁) + Aᵢ₂·sin(λ₂t+ε₂) с
+    ${isDefault ? `<div class="step"><span class="cmnt">Форма записи решения: qᵢ(t) = Aᵢ₁·sin(λ₁t+ε₁) + Aᵢ₂·sin(λ₂t+ε₂) с
       A₁₁ = −${f(Math.abs(s.b1), 7)}, A₁₂ = ${f(Math.abs(s.b2), 8)}, A₂₁ = −${f(Math.abs(s.r1 * s.b1), 7)},
       A₂₂ = −${f(Math.abs(s.r2 * s.b2), 9)}, ε₁ = 3π, ε₂ = π — это то же самое:
       sin(x+3π) = sin(x+π) = −sin x.</span></div>` : ''}`;
@@ -229,7 +229,7 @@
 
   rebuild();
 
-  /* ---------- самопроверка с эталонами Mathcad ---------- */
+  /* ---------- самопроверка с эталонами ---------- */
   {
     const s = sol; // дефолт: толчок v20=5
     V.selfcheck('m3', [
