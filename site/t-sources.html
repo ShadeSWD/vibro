@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Глава 1. Возмущающие силы и опасность вибрации</title>
+<meta name="description" content="Источники вибрации судна: классификация возмущающих сил, неуравновешенная масса механизма, гребной винт в неравномерном попутном потоке, вывод лопастной частоты, общая и местная вибрация, чем опасны резонансы.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<main class="wrap">
+  <h1>Глава 1. Возмущающие силы и опасность вибрации</h1>
+  <p class="lead">Вибрация корабля — колебания корпуса и его конструкций под действием
+  периодических возмущающих сил. Прежде чем считать колебания, нужно понять, откуда
+  берутся силы, какие у них частоты и почему совпадение этих частот с собственными
+  опасно.</p>
+  <p><a class="theory-link" href="theory">Оглавление</a>
+     <a class="theory-link" href="t-single">Глава 2: одна степень свободы →</a></p>
+
+  <h2 id="cls">1.1. Классификация возмущающих сил</h2>
+  <p>По характеру изменения во времени возмущающие силы делят на три группы:</p>
+  <ul>
+    <li><b>периодические</b> — повторяются с определённым периодом: силы от
+    неуравновешенных механизмов, от гребного винта; главный объект курса;</li>
+    <li><b>апериодические</b> (ударные) — однократные или редкие воздействия: удар волны
+    в развал носа, слеминг — удар днищем о воду, подрыв, посадка на мель; вызывают
+    затухающие свободные колебания корпуса (упругий «звон» после удара);</li>
+    <li><b>комбинированные</b> — периодическая составляющая на фоне случайной или
+    ударной: волнение с редкими ударами, работа механизма с переменным режимом.</li>
+  </ul>
+  <div class="panel" style="max-width:760px">
+    <svg viewBox="0 0 720 180" class="anim" id="svgCls"></svg>
+    <div class="caption">Три типа возмущения: периодическое (винт, механизмы), ударное
+    (слеминг) и комбинированное.</div>
+  </div>
+
+  <h2 id="unbal">1.2. Неуравновешенная масса механизма</h2>
+  <p>Пусть на валу механизма, вращающемся с угловой скоростью ω, сидит неуравновешенная
+  масса \(m_0\) на радиусе r (дисбаланс ротора, кривошип насоса). Масса движется по
+  окружности с центростремительным ускорением \(r\omega^2\), значит на подшипники — и через
+  фундамент на корпус — передаётся <b>центробежная сила</b>, вращающаяся вместе с валом:</p>
+  <div class="formula key">$$F = m_0\, r\,\omega^2 .$$</div>
+  <p>Неподвижному корпусу «видны» проекции этой силы на оси. Если в момент \(t = 0\) сила
+  направлена вдоль оси x, то</p>
+  <div class="formula">$$F_x = F\cos\omega t, \qquad F_y = F\sin\omega t$$</div>
+  <p>— каждая проекция есть <b>гармоническая возмущающая сила</b> частоты вращения ω с
+  амплитудой, растущей как квадрат оборотов. Отсюда два практических вывода: балансировка
+  роторов — первая мера борьбы с вибрацией, а рост оборотов вдвое учетверяет силу.</p>
+  <div class="panel" style="max-width:760px">
+    <svg id="svgProp" class="anim" viewBox="0 0 720 260"></svg>
+    <div class="caption">Вращающаяся сила F и её горизонтальная проекция —
+    гармоническое возмущение частоты ω.</div>
+  </div>
+
+  <h2 id="blade">1.3. Гребной винт и лопастная частота</h2>
+  <p>Главный источник общей вибрации корпуса — <b>гребной винт</b>. Он работает в
+  <b>попутном потоке</b> за корпусом, а попутный поток неравномерен: вблизи ахтерштевня и
+  дейдвуда вода заторможена корпусом сильнее, чем на периферии диска винта. Лопасть, проходя
+  заторможенную зону, встречает бóльшую скорость натекания «на себя», и упор лопасти
+  скачком возрастает; выйдя из зоны — падает. Каждая из N лопастей проходит зону один раз
+  за оборот, поэтому упор и момент винта пульсируют с частотой, в N раз выше частоты
+  вращения вала.</p>
+  <p>Выведем эту частоту. Частоту вращения вала задают в оборотах в минуту — n об/мин.
+  Один оборот — угол 2π, одна минута — 60 с, значит угловая скорость вала</p>
+  <div class="formula">$$\omega = \frac{2\pi n}{60} = \frac{\pi n}{30}\ \text{рад/с}.$$</div>
+  <p>Мимо фиксированной точки (ахтерштевня) лопасти проходят в N раз чаще, чем совершается
+  оборот, — <b>лопастная частота</b>:</p>
+  <div class="formula key">$$\omega_{\text{л}} = N\,\omega = \frac{\pi N n}{30}, \qquad
+    f_{\text{л}} = \frac{N n}{60}\ \text{Гц}.$$</div>
+  <p>Пример: винт с N = 4 лопастями при n = 120 об/мин даёт
+  \(f_{\text{л}} = 4\cdot120/60 = 8\) Гц — как раз порядок собственных частот корпуса.
+  Кроме первой лопастной гармоники в спектре возмущения есть кратные ей
+  \(2\omega_{\text{л}},\ 3\omega_{\text{л}},\dots\) (поток неравномерен не по синусу) и
+  <b>вальная</b> частота ω — от неуравновешенности самого вала и винта
+  (погнутость, разный шаг лопастей).</p>
+  <div class="panel" style="max-width:760px">
+    <svg viewBox="0 0 720 270" class="anim" id="svgWake"></svg>
+    <div class="caption">Кормовая оконечность: диск винта и поле попутного потока.
+    В заштрихованной зоне за дейдвудом вода заторможена — лопасть, проходя её,
+    даёт всплеск упора; N лопастей — N всплесков за оборот.</div>
+  </div>
+  <p>Через винт на корпус идут два пути передачи возмущения: <b>через валопровод</b>
+  (пульсации упора и момента — на упорный подшипник) и <b>через воду</b> (пульсации
+  давления на кормовую обшивку от проходящих лопастей; при кавитации они резко растут).</p>
+
+  <h2 id="danger">1.4. Чем опасна вибрация</h2>
+  <p>Возмущающие силы сами по себе невелики — доли процента от упора винта. Опасность
+  возникает при <b>резонансе</b>: совпадении частоты возмущения (обычно лопастной) с одной
+  из собственных частот конструкции — тогда амплитуды ограничены только затуханием и
+  вырастают на порядок (<a href="t-single#forced">глава 2</a>). Последствия:</p>
+  <ul>
+    <li><b>усталостные трещины</b> в отдельных связях корпуса и разрушение узлов —
+    вибрационные напряжения при большом числе циклов «съедают» ресурс металла;</li>
+    <li><b>нарушение нормальной работы приборов</b> и механизмов — навигационного
+    оборудования, средств автоматики;</li>
+    <li><b>недопустимые условия обитаемости</b> — вибрация жилых помещений нормируется
+    санитарными нормами по амплитудам скоростей и ускорений.</li>
+  </ul>
+  <p>По масштабу колеблющейся конструкции вибрацию делят на:</p>
+  <ul>
+    <li><b>общую</b> — весь корпус изгибается как балка; собственные частоты низшие,
+    единицы герц (примерно 1–15 Гц) — <a href="t-energy#hull">глава 6</a> и страница
+    <a href="hull">«Корпус судна»</a>;</li>
+    <li><b>местную</b> — колеблются отдельные конструкции: перекрытия, балки набора,
+    пластины обшивки и настилов, мачты, фундаменты; частоты — десятки и сотни герц
+    (порядка 10–200 Гц) — <a href="t-beams">главы 4</a> и <a href="t-plates">5</a>.</li>
+  </ul>
+  <div class="panel" style="max-width:760px">
+    <svg viewBox="0 0 720 190" class="anim" id="svgScale"></svg>
+    <div class="caption">Шкала частот: тоны общей вибрации корпуса — внизу, местная
+    вибрация — выше; лопастная частота с ростом оборотов «проезжает» по собственным
+    частотам корпуса.</div>
+  </div>
+  <p>Отсюда программа курса: научиться считать собственные частоты и амплитуды —
+  сначала для системы с одной степенью свободы (<a href="t-single">глава 2</a>),
+  затем для систем с несколькими (<a href="t-two">глава 3</a>), балок и рам
+  (<a href="t-beams">глава 4</a>), пластин (<a href="t-plates">глава 5</a>) и, наконец,
+  корпуса в целом (<a href="t-energy">глава 6</a>).</p>
+
+  <p><a class="theory-link" href="demo-m2">Модель М2: резонанс своими руками</a>
+     <a class="theory-link" href="hull">Живой корпус: резонансная проверка</a></p>
+</main>
+<script src="assets/site.js" data-root="./" data-page="t-sources"></script>
+<script src="assets/vibro.js"></script>
+<script>
+'use strict';
+(() => {
+  /* --- 1.1 три типа возмущения --- */
+  {
+    const svg = document.getElementById('svgCls');
+    const y0 = 95, A = 42;
+    const draw = (x0, w, fn, col, name) => {
+      V.el('rect', { x: x0, y: 18, width: w, height: 150, fill: '#fff', stroke: '#d8d6cf', rx: 8 }, svg);
+      V.el('line', { x1: x0 + 8, y1: y0, x2: x0 + w - 8, y2: y0, stroke: '#ececec' }, svg);
+      const pts = [];
+      for (let i = 0; i <= 140; i++) {
+        const t = i / 140;
+        pts.push(`${(x0 + 10 + t * (w - 20)).toFixed(1)},${(y0 - A * fn(t)).toFixed(1)}`);
+      }
+      V.el('polyline', { points: pts.join(' '), fill: 'none', stroke: col, 'stroke-width': 2 }, svg);
+      V.el('text', { x: x0 + w / 2, y: 160, 'text-anchor': 'middle', class: 'lbl', 'font-size': 13, fill: '#6b6b74' }, svg).textContent = name;
+    };
+    draw(14, 224, (t) => Math.sin(t * 8 * Math.PI) * 0.9, '#155e75', 'периодическое');
+    draw(250, 224, (t) => (t < 0.25 ? 0 : Math.exp(-(t - 0.25) * 9) * Math.cos((t - 0.25) * 22)), '#b3382e', 'ударное (слеминг)');
+    draw(486, 224, (t) => 0.55 * Math.sin(t * 8 * Math.PI) + 0.35 * Math.sin(t * 33 + 1.2) + (t > 0.6 ? 0.5 * Math.exp(-(t - 0.6) * 12) : 0), '#1a7f37', 'комбинированное');
+  }
+
+  /* --- 1.2 вращающаяся сила (из прежнего конспекта) --- */
+  {
+    const svg = document.getElementById('svgProp');
+    const cx = 150, cy = 130, R = 95;
+    V.el('circle', { cx, cy, r: R, fill: 'none', stroke: '#d8d6cf', 'stroke-dasharray': '4 4' }, svg);
+    const hub = V.el('g', {}, svg);
+    for (let i = 0; i < 4; i++)
+      V.el('ellipse', { cx: 0, cy: -52, rx: 16, ry: 40, fill: '#e7eef1', stroke: '#155e75', 'stroke-width': 1.6, transform: `rotate(${i * 90})` }, hub);
+    V.el('circle', { cx: 0, cy: 0, r: 13, fill: '#155e75' }, hub);
+    const vec = V.el('line', { x1: cx, y1: cy, stroke: '#b3382e', 'stroke-width': 3, 'marker-end': 'url(#arrR)' }, svg);
+    const proj = V.el('line', { y1: cy, y2: cy, stroke: '#1a7f37', 'stroke-width': 3 }, svg);
+    const dash = V.el('line', { stroke: '#9a9aa2', 'stroke-dasharray': '4 4' }, svg);
+    V.el('text', { x: cx + R + 14, y: cy + 20, class: 'lbl', fill: '#1a7f37' }, svg).textContent = 'Fₓ = F·cos ωt';
+    V.el('text', { x: cx - 30, y: 26, class: 'lbl', fill: '#b3382e' }, svg).textContent = 'F (вращается с ω)';
+    const gx = 320, gw = 380;
+    V.el('line', { x1: gx, y1: cy, x2: gx + gw, y2: cy, stroke: '#b9b9c0' }, svg);
+    const sine = V.el('polyline', { fill: 'none', stroke: '#1a7f37', 'stroke-width': 2 }, svg);
+    const dot = V.el('circle', { r: 4, fill: '#1a7f37' }, svg);
+    V.loop((dt, t) => {
+      const w = 1.6, ph = w * t;
+      const fx = Math.cos(ph), fy = -Math.sin(ph);
+      hub.setAttribute('transform', `translate(${cx},${cy}) rotate(${(ph * 180 / Math.PI / 2).toFixed(1)})`);
+      vec.setAttribute('x2', cx + R * fx); vec.setAttribute('y2', cy + R * fy);
+      proj.setAttribute('x1', cx); proj.setAttribute('x2', cx + R * fx);
+      dash.setAttribute('x1', cx + R * fx); dash.setAttribute('y1', cy + R * fy);
+      dash.setAttribute('x2', cx + R * fx); dash.setAttribute('y2', cy);
+      const pts = [];
+      for (let i = 0; i <= 160; i++) {
+        const tt = ph - i * 0.06;
+        pts.push(`${(gx + i * gw / 160).toFixed(1)},${(cy - 70 * Math.cos(tt)).toFixed(1)}`);
+      }
+      sine.setAttribute('points', pts.join(' '));
+      dot.setAttribute('cx', gx); dot.setAttribute('cy', cy - 70 * Math.cos(ph));
+    });
+  }
+
+  /* --- 1.3 корма, диск винта и попутный поток --- */
+  {
+    const svg = document.getElementById('svgWake');
+    // корпус (вид сбоку, корма слева направо к ахтерштевню)
+    V.el('path', { d: 'M 20 60 L 400 60 Q 470 62 500 92 L 512 128 L 400 128 L 20 128 Z',
+      fill: 'rgba(22,22,26,.05)', stroke: '#16161a', 'stroke-width': 1.8 }, svg);
+    V.el('line', { x1: 20, y1: 92, x2: 700, y2: 92, stroke: '#155e75', 'stroke-width': 1.2, 'stroke-dasharray': '8 5' }, svg);
+    V.el('text', { x: 26, y: 86, class: 'lbl', fill: '#155e75', 'font-size': 12.5 }, svg).textContent = 'ВЛ';
+    V.el('text', { x: 60, y: 110, class: 'lbl', 'font-size': 13 }, svg).textContent = 'корпус (корма)';
+    // руль
+    V.el('path', { d: 'M 640 100 L 668 100 L 664 190 L 644 190 Z', fill: '#e7eef1', stroke: '#16161a', 'stroke-width': 1.4 }, svg);
+    // диск винта
+    V.el('ellipse', { cx: 566, cy: 150, rx: 14, ry: 62, fill: 'rgba(21,94,117,.10)', stroke: '#155e75', 'stroke-width': 1.8 }, svg);
+    V.el('circle', { cx: 566, cy: 150, r: 7, fill: '#155e75' }, svg);
+    V.el('line', { x1: 512, y1: 150, x2: 559, y2: 150, stroke: '#16161a', 'stroke-width': 4 }, svg);
+    V.el('text', { x: 560, y: 236, class: 'lbl', fill: '#155e75', 'font-size': 13 }, svg).textContent = 'диск винта';
+    // зона заторможенного потока за дейдвудом
+    V.el('path', { d: 'M 500 96 Q 540 108 566 112 Q 592 108 620 100 L 620 128 Q 592 136 566 138 Q 540 136 500 130 Z',
+      fill: 'rgba(179,56,46,.16)', stroke: '#b3382e', 'stroke-width': 1.2, 'stroke-dasharray': '4 3' }, svg);
+    V.el('text', { x: 448, y: 40, class: 'lbl', fill: '#b3382e', 'font-size': 13 }, svg).textContent = 'зона заторможенного потока';
+    V.el('line', { x1: 560, y1: 44, x2: 566, y2: 108, stroke: '#b3382e', 'stroke-width': 1 }, svg);
+    // стрелки потока
+    for (const [y, len] of [[150, 52], [175, 58], [200, 60], [125, 34]]) {
+      V.el('line', { x1: 380, y1: y, x2: 380 + len, y2: y, stroke: '#1a7f37', 'stroke-width': 2, 'marker-end': 'url(#arrE)' }, svg);
+    }
+    V.el('text', { x: 380, y: 226, class: 'lbl', fill: '#1a7f37', 'font-size': 13 }, svg).textContent = 'попутный поток (короче стрелка — сильнее заторможен)';
+  }
+
+  /* --- 1.4 шкала частот --- */
+  {
+    const svg = document.getElementById('svgScale');
+    const x0 = 50, w = 640, y = 120;
+    // логарифмическая шкала 0.5..500 Гц
+    const X = (f) => x0 + (Math.log10(f) - Math.log10(0.5)) / (Math.log10(500) - Math.log10(0.5)) * w;
+    V.el('line', { x1: x0 - 6, y1: y, x2: x0 + w + 6, y2: y, stroke: '#16161a', 'stroke-width': 1.6, 'marker-end': 'url(#arrE)' }, svg);
+    [0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500].forEach((f) => {
+      V.el('line', { x1: X(f), y1: y - 5, x2: X(f), y2: y + 5, stroke: '#16161a' }, svg);
+      V.el('text', { x: X(f), y: y + 22, 'text-anchor': 'middle', class: 'lbl-axis', 'font-size': 12 }, svg).textContent = String(f).replace('.', ',');
+    });
+    V.el('text', { x: x0 + w, y: y + 40, 'text-anchor': 'end', class: 'lbl-axis' }, svg).textContent = 'f, Гц';
+    // общая вибрация
+    V.el('rect', { x: X(1), y: y - 40, width: X(15) - X(1), height: 22, rx: 6, fill: 'rgba(21,94,117,.15)', stroke: '#155e75' }, svg);
+    V.el('text', { x: (X(1) + X(15)) / 2, y: y - 25, 'text-anchor': 'middle', class: 'lbl', fill: '#155e75', 'font-size': 13 }, svg).textContent = 'общая (корпус)';
+    // местная
+    V.el('rect', { x: X(10), y: y - 78, width: X(200) - X(10), height: 22, rx: 6, fill: 'rgba(26,127,55,.14)', stroke: '#1a7f37' }, svg);
+    V.el('text', { x: (X(10) + X(200)) / 2, y: y - 63, 'text-anchor': 'middle', class: 'lbl', fill: '#1a7f37', 'font-size': 13 }, svg).textContent = 'местная (перекрытия, пластины)';
+    // лопастная
+    V.el('line', { x1: X(8), y1: y - 96, x2: X(8), y2: y - 4, stroke: '#b3382e', 'stroke-width': 2, 'stroke-dasharray': '6 4' }, svg);
+    V.el('text', { x: X(8) + 6, y: y - 88, class: 'lbl', fill: '#b3382e', 'font-size': 13 }, svg).textContent = 'ω_л = πNn/30 (растёт с оборотами →)';
+  }
+})();
+</script>
+</body>
+</html>

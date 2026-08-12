@@ -11,9 +11,17 @@
     { href: 'demo-m4', title: 'М4. Линейка на вибростенде' },
     { href: 'demo-m5', title: 'М5. Автомобиль по неровной дороге' },
   ];
+  const chapters = [
+    { href: 't-sources', title: 'Гл. 1. Возмущающие силы' },
+    { href: 't-single', title: 'Гл. 2. Одна степень свободы' },
+    { href: 't-two', title: 'Гл. 3. Несколько степеней свободы' },
+    { href: 't-beams', title: 'Гл. 4. Балки и рамы' },
+    { href: 't-plates', title: 'Гл. 5. Пластины' },
+    { href: 't-energy', title: 'Гл. 6. Метод Релея и корпус' },
+  ];
   const nav = [
     { href: '', key: 'index', title: 'Обзор' },
-    { href: 'theory', key: 'theory', title: 'Теория' },
+    { href: 'theory', key: 'theory', title: 'Теория', drop: chapters },
     { href: 'models', key: 'models', title: 'Модели', drop: models },
     { href: 'hull', key: 'hull', title: 'Корпус судна' },
     { href: 'sources', key: 'sources', title: 'Источники' },

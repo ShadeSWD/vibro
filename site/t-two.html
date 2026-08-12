@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Глава 3. Системы с несколькими степенями свободы</title>
+<meta name="description" content="Уравнения Лагранжа II рода и их вывод для цепочки масс, частотное уравнение, собственные формы, биения, динамический гаситель колебаний с условием настройки, обобщение на n степеней свободы, колебания автомобиля.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<main class="wrap">
+  <h1>Глава 3. Системы с несколькими степенями свободы</h1>
+  <p class="lead">Двигатель на амортизаторах, надстройка на корпусе, гаситель на мачте —
+  это уже не один осциллятор, а связка. У системы с n степенями свободы n собственных
+  частот и n форм колебаний; здесь мы получаем их регулярным способом — через уравнения
+  Лагранжа.</p>
+  <p><a class="theory-link" href="theory">Оглавление</a>
+     <a class="theory-link" href="demo-m3">Модель М3: две массы</a>
+     <a class="theory-link" href="demo-m5">Модель М5: автомобиль</a></p>
+
+  <h2 id="lagrange">3.1. Уравнения Лагранжа II рода</h2>
+  <p>Для системы с обобщёнными координатами \(q_1,\dots,q_n\), кинетической энергией T,
+  потенциальной П и обобщёнными непотенциальными силами \(Q_i\) уравнения движения:</p>
+  <div class="formula key">$$\frac{d}{dt}\frac{\partial T}{\partial \dot q_i}
+    - \frac{\partial T}{\partial q_i} + \frac{\partial \Pi}{\partial q_i} = Q_i,
+    \qquad i = 1,\dots,n.$$</div>
+  <p>Их сила в том, что не нужно расставлять реакции связей — достаточно записать две
+  энергии. Применим к <b>цепочке из двух масс</b>: масса \(m_1\) на пружине \(c_1\)
+  (к опоре), к ней на пружине \(c_2\) подвешена масса \(m_2\); координаты \(q_1,\ q_2\) —
+  смещения масс от положений равновесия.</p>
+  <div class="panel" style="max-width:640px">
+    <svg viewBox="0 0 640 250" class="anim" id="svgChain"></svg>
+    <div class="caption">Цепочка двух масс: деформация первой пружины q₁, второй — q₂−q₁.</div>
+  </div>
+  <p>Энергии: первая пружина деформирована на \(q_1\), вторая — на разность смещений
+  \(q_2 - q_1\):</p>
+  <div class="formula">$$T = \tfrac12 m_1\dot q_1^2 + \tfrac12 m_2\dot q_2^2, \qquad
+    \Pi = \tfrac12 c_1 q_1^2 + \tfrac12 c_2 (q_2 - q_1)^2 .$$</div>
+  <p>Считаем производные для \(i = 1\):
+  \(\frac{d}{dt}\frac{\partial T}{\partial \dot q_1} = m_1\ddot q_1\),
+  \(\frac{\partial T}{\partial q_1} = 0\),
+  \(\frac{\partial \Pi}{\partial q_1} = c_1 q_1 - c_2(q_2 - q_1)\); аналогично для
+  \(i = 2\). Свободные колебания \((Q_i = 0)\):</p>
+  <div class="formula key">$$\begin{aligned}
+    m_1\ddot q_1 + (c_1 + c_2)\,q_1 - c_2\,q_2 &= 0,\\
+    m_2\ddot q_2 - c_2\,q_1 + c_2\,q_2 &= 0.
+  \end{aligned}$$</div>
+  <p>Уравнения <b>связаны</b> через \(c_2\): движение одной массы возбуждает другую.</p>
+
+  <h2 id="freq">3.2. Частотное уравнение и формы</h2>
+  <p>Ищем решение, в котором обе массы колеблются с одной частотой и в одной фазе
+  (<b>главное колебание</b>): \(q_i = A_i\cos(\lambda t - \varepsilon)\). Подстановка
+  (каждое \(\ddot q_i = -\lambda^2 q_i\)) даёт однородную алгебраическую систему:</p>
+  <div class="formula">$$\begin{aligned}
+    (c_1 + c_2 - m_1\lambda^2)A_1 - c_2 A_2 &= 0,\\
+    -c_2 A_1 + (c_2 - m_2\lambda^2)A_2 &= 0.
+  \end{aligned}$$</div>
+  <p>Ненулевые амплитуды существуют, лишь когда определитель равен нулю —
+  это <b>частотное уравнение</b>:</p>
+  <div class="formula key">$$\det\begin{pmatrix} c_1 + c_2 - m_1\lambda^2 & -c_2\\
+    -c_2 & c_2 - m_2\lambda^2\end{pmatrix} = 0$$</div>
+  <p>— биквадратное относительно λ:</p>
+  <div class="formula">$$m_1 m_2 \lambda^4 - \bigl[m_2(c_1 + c_2) + m_1 c_2\bigr]\lambda^2
+    + c_1 c_2 = 0 .$$</div>
+  <p>Дискриминант положителен всегда, оба корня \(\lambda_1^2 &lt; \lambda_2^2\)
+  вещественны и положительны: у системы <b>две собственные частоты</b>. Каждой отвечает
+  своя <b>форма</b> — фиксированное отношение амплитуд из любого уравнения системы:</p>
+  <div class="formula">$$\varkappa_n = \frac{A_2}{A_1}\bigg|_{\lambda_n}
+    = \frac{c_1 + c_2 - m_1\lambda_n^2}{c_2}, \qquad n = 1, 2.$$</div>
+  <p>Для низшей частоты \(\varkappa_1 &gt; 0\) — массы движутся <b>синфазно</b>; для высшей
+  \(\varkappa_2 &lt; 0\) — <b>противофазно</b>, между массами есть точка, которая почти не
+  движется (узел). Общее решение свободных колебаний — суперпозиция главных колебаний:</p>
+  <div class="formula">$$q_1 = A^{(1)}\cos(\lambda_1 t - \varepsilon_1) + A^{(2)}\cos(\lambda_2 t - \varepsilon_2),
+    \qquad q_2 = \varkappa_1 A^{(1)}\cos(\lambda_1 t - \varepsilon_1) + \varkappa_2 A^{(2)}\cos(\lambda_2 t - \varepsilon_2);$$</div>
+  <p>четыре постоянных находятся из четырёх начальных условий. Какие формы «зазвучат» —
+  решает начальный толчок: толкнув обе массы «по первой форме», вторую не разбудишь.</p>
+  <div class="panel" style="max-width:760px">
+    <svg viewBox="0 0 720 240" class="anim" id="svgForms"></svg>
+    <div class="caption">Две формы двухмассовой цепочки: синфазная (λ₁) и противофазная
+    (λ₂) — и биения при возбуждении обеих форм с близкими частотами.</div>
+  </div>
+
+  <h2 id="beats">3.3. Биения</h2>
+  <p>Если частоты близки \((\lambda_2 - \lambda_1 \ll \lambda_1)\) и возбуждены обе формы
+  с сопоставимыми амплитудами, сумма двух гармоник</p>
+  <div class="formula">$$A\cos\lambda_1 t + A\cos\lambda_2 t
+    = 2A\cos\frac{\lambda_2 - \lambda_1}{2}t\cdot\cos\frac{\lambda_1 + \lambda_2}{2}t$$</div>
+  <p>выглядит как колебание средней частоты с медленно пульсирующей амплитудой — <b>биения</b>
+  с периодом \(T_\text{б} = 2\pi/(\lambda_2 - \lambda_1)\). Энергия перекачивается от массы
+  к массе и обратно: одна замирает — другая раскачивается. Биения хорошо видны в
+  <a href="demo-m3">модели М3</a> при слабой связующей пружине.</p>
+
+  <h2 id="absorber">3.4. Динамический гаситель колебаний</h2>
+  <p>Пусть конструкцию (масса \(m_1\), жёсткость \(c_1\)) раскачивает гармоническая сила
+  \(Q_0\sin\omega t\) с фиксированной рабочей частотой ω (например, лопастной). Подвесим к
+  ней небольшую массу \(m_2\) на пружине \(c_2\). Установившиеся вынужденные колебания без
+  учёта затухания: \(q_i = a_i\sin\omega t\), и система 3.2 с силой в правой части первого
+  уравнения даёт (по правилу Крамера):</p>
+  <div class="formula">$$a_1 = \frac{(c_2 - m_2\omega^2)\,Q_0}{\Delta(\omega)}, \qquad
+    a_2 = \frac{c_2\,Q_0}{\Delta(\omega)}, \qquad
+    \Delta(\omega) = (c_1 + c_2 - m_1\omega^2)(c_2 - m_2\omega^2) - c_2^2 .$$</div>
+  <p>Числитель \(a_1\) обращается в нуль при</p>
+  <div class="formula key">$$\frac{c_2}{m_2} = \omega^2$$</div>
+  <p>— если парциальная частота гасителя настроена на частоту силы, <b>основная масса
+  останавливается полностью</b> \((a_1 = 0)\), а гаситель колеблется в противофазе с силой
+  с амплитудой \(a_2 = -Q_0/c_2\): сила пружины гасителя в каждый момент уравновешивает
+  возмущающую силу. Плата за это — вместо одного резонанса системы появляются <b>два</b>
+  (корни \(\Delta = 0\) лежат по обе стороны от ω), поэтому гаситель эффективен только при
+  стабильной частоте возмущения. Так гасят вибрацию мачт, платформ приборов, фундаментов
+  и валопроводов.</p>
+  <div class="panel" style="max-width:760px">
+    <svg viewBox="0 0 720 300" class="anim" id="svgAbs"></svg>
+    <div class="caption">Амплитуда основной массы |a₁| до (серым) и после установки
+    гасителя: в точке настройки ω = √(c₂/m₂) — нуль, по бокам — два новых резонанса.</div>
+  </div>
+  <p><a class="theory-link" href="demo-m3">Модель М3: противофазная форма — прообраз гасителя</a></p>
+
+  <h2 id="general">3.5. Обобщение на n степеней свободы</h2>
+  <p>Для любой линейной системы уравнения Лагранжа дают матричную запись
+  \(M\ddot q + Cq = 0\) с симметричными матрицами масс M и жёсткостей C. Подстановка
+  \(q = A\cos(\lambda t - \varepsilon)\) приводит к обобщённой задаче о собственных
+  значениях \((C - \lambda^2 M)A = 0\); умножив слева на \(M^{-1}\) и обозначив
+  \(C^* = M^{-1}C\), получаем частотное уравнение степени n относительно \(\lambda^2\):</p>
+  <div class="formula key">$$\det\left|\,C^* - \lambda^2 E\,\right| = 0 .$$</div>
+  <p>Его корни \(\lambda_1 \le \lambda_2 \le \dots \le \lambda_n\) — спектр собственных
+  частот, собственные векторы — формы. Формы взаимно ортогональны с весами M и C
+  \((A_i^T M A_j = 0\) при \(i \ne j)\), поэтому в координатах форм система распадается на
+  n независимых осцилляторов — и весь аппарат главы 2 (декремент, коэффициент динамичности)
+  применяется к каждой форме отдельно. Это — основа расчёта и балок
+  (<a href="t-beams">глава 4</a>, форм бесконечно много), и корпуса
+  (<a href="t-energy#hull">глава 6</a>).</p>
+
+  <h2 id="car">3.6. Пример: колебания автомобиля (судовой аналог — корпус на волне)</h2>
+  <p>Классическая иллюстрация метода Лагранжа — кузов массой M с моментом инерции J
+  относительно центра тяжести на двух рессорах \(c_1\) (передняя, на расстоянии a перед
+  ЦТ) и \(c_2\) (задняя, b позади). Координаты: вертикальное смещение ЦТ z и угол
+  поворота φ. Смещения точек крепления рессор: \(z - a\varphi\) и \(z + b\varphi\), откуда</p>
+  <div class="formula">$$T = \tfrac12 M\dot z^2 + \tfrac12 J\dot\varphi^2, \qquad
+    \Pi = \tfrac12 c_1 (z - a\varphi)^2 + \tfrac12 c_2 (z + b\varphi)^2 .$$</div>
+  <p>Уравнения Лагранжа:</p>
+  <div class="formula">$$\begin{aligned}
+    M\ddot z + (c_1 + c_2)\,z + (c_2 b - c_1 a)\,\varphi &= 0,\\
+    J\ddot\varphi + (c_2 b - c_1 a)\,z + (c_1 a^2 + c_2 b^2)\,\varphi &= 0.
+  \end{aligned}$$</div>
+  <p>Вертикальные и килевые колебания связаны через член \(c_2 b - c_1 a\) и расцепляются
+  лишь при \(c_1 a = c_2 b\). Это точный двойник задачи о вертикальной и килевой качке
+  судна и о колебаниях механизма на амортизаторах. Частотное уравнение — снова
+  биквадратное; при движении по волнистой дороге со скоростью v возмущение имеет частоту
+  \(\omega = 2\pi v/L_\text{волны}\) и возможен резонанс по каждой из двух форм —
+  <a href="demo-m5">модель М5</a> показывает обе резонансные скорости.</p>
+
+  <p><a class="theory-link" href="t-beams">Глава 4: балки и рамы →</a></p>
+</main>
+<script src="assets/site.js" data-root="./" data-page="t-two"></script>
+<script src="assets/vibro.js"></script>
+<script>
+'use strict';
+(() => {
+  /* --- 3.1 цепочка двух масс --- */
+  {
+    const svg = document.getElementById('svgChain');
+    V.el('line', { x1: 60, y1: 30, x2: 300, y2: 30, stroke: '#16161a', 'stroke-width': 2.4 }, svg);
+    V.el('path', { d: V.hatch(60, 30, 300, 30), stroke: '#9a9aa2', 'stroke-width': 1.1, fill: 'none' }, svg);
+    V.el('polyline', { points: V.springPts(180, 30, 180, 90, 9), fill: 'none', stroke: '#155e75', 'stroke-width': 2.2 }, svg);
+    V.el('text', { x: 138, y: 66, class: 'lbl', fill: '#155e75' }, svg).textContent = 'c₁';
+    V.el('rect', { x: 120, y: 90, width: 120, height: 44, rx: 8, fill: '#e7eef1', stroke: '#155e75', 'stroke-width': 2 }, svg);
+    V.el('text', { x: 180, y: 118, 'text-anchor': 'middle', class: 'lbl' }, svg).textContent = 'm₁';
+    V.el('polyline', { points: V.springPts(180, 134, 180, 186, 8), fill: 'none', stroke: '#155e75', 'stroke-width': 2.2 }, svg);
+    V.el('text', { x: 138, y: 164, class: 'lbl', fill: '#155e75' }, svg).textContent = 'c₂';
+    V.el('rect', { x: 132, y: 186, width: 96, height: 40, rx: 8, fill: '#fdf0ef', stroke: '#b3382e', 'stroke-width': 2 }, svg);
+    V.el('text', { x: 180, y: 212, 'text-anchor': 'middle', class: 'lbl' }, svg).textContent = 'm₂';
+    // координаты
+    V.el('line', { x1: 420, y1: 60, x2: 420, y2: 230, stroke: '#9a9aa2', 'stroke-width': 1.1 }, svg);
+    V.el('line', { x1: 412, y1: 112, x2: 428, y2: 112, stroke: '#16161a', 'stroke-width': 1.4 }, svg);
+    V.el('line', { x1: 420, y1: 112, x2: 420, y2: 76, stroke: '#1a7f37', 'stroke-width': 2.2, 'marker-end': 'url(#arrE)' }, svg);
+    V.el('text', { x: 430, y: 92, class: 'lbl', fill: '#1a7f37' }, svg).textContent = 'q₁';
+    V.el('line', { x1: 412, y1: 206, x2: 428, y2: 206, stroke: '#16161a', 'stroke-width': 1.4 }, svg);
+    V.el('line', { x1: 420, y1: 206, x2: 420, y2: 162, stroke: '#1a7f37', 'stroke-width': 2.2, 'marker-end': 'url(#arrE)' }, svg);
+    V.el('text', { x: 430, y: 182, class: 'lbl', fill: '#1a7f37' }, svg).textContent = 'q₂';
+    V.el('text', { x: 448, y: 132, class: 'lbl', 'font-size': 13, fill: '#6b6b74' }, svg).textContent = 'деформация c₂: q₂ − q₁';
+  }
+
+  /* --- 3.2 формы + биения (анимация) --- */
+  {
+    const svg = document.getElementById('svgForms');
+    // параметры: m1=m2=1, c1=c2=1 → λ1²=(3−√5)/2, λ2²=(3+√5)/2; формы κ1=(1+√5)/2, κ2=(1−√5)/2
+    const l1 = Math.sqrt((3 - Math.sqrt(5)) / 2), l2 = Math.sqrt((3 + Math.sqrt(5)) / 2);
+    const k1 = (1 + Math.sqrt(5)) / 2, k2 = (1 - Math.sqrt(5)) / 2;
+    const cols = [{ x: 110, name: 'форма 1 (синфазно)', mode: 1 },
+                  { x: 330, name: 'форма 2 (противофазно)', mode: 2 },
+                  { x: 570, name: 'обе формы: биения', mode: 3 }];
+    const parts = cols.map((c) => {
+      V.el('text', { x: c.x, y: 20, 'text-anchor': 'middle', class: 'lbl', 'font-size': 13, fill: '#6b6b74' }, svg).textContent = c.name;
+      V.el('line', { x1: c.x - 60, y1: 34, x2: c.x + 60, y2: 34, stroke: '#16161a', 'stroke-width': 2 }, svg);
+      const s1 = V.el('polyline', { fill: 'none', stroke: '#155e75', 'stroke-width': 1.8 }, svg);
+      const b1 = V.el('rect', { x: c.x - 34, width: 68, height: 26, rx: 6, fill: '#e7eef1', stroke: '#155e75', 'stroke-width': 1.6 }, svg);
+      const s2 = V.el('polyline', { fill: 'none', stroke: '#155e75', 'stroke-width': 1.8 }, svg);
+      const b2 = V.el('rect', { x: c.x - 26, width: 52, height: 24, rx: 6, fill: '#fdf0ef', stroke: '#b3382e', 'stroke-width': 1.6 }, svg);
+      return { ...c, s1, b1, s2, b2 };
+    });
+    const y10 = 96, y20 = 176; // равновесные положения верха масс
+    V.loop((dt, t) => {
+      for (const p of parts) {
+        let u1, u2;
+        const sc = 14, tt = t * 1.5;
+        if (p.mode === 1) { u1 = sc * Math.cos(l1 * tt); u2 = k1 * u1; }
+        else if (p.mode === 2) { u1 = sc * 0.8 * Math.cos(l2 * tt); u2 = k2 * u1; }
+        else {
+          u1 = sc * 0.6 * (Math.cos(l1 * tt) + Math.cos(l2 * tt));
+          u2 = sc * 0.6 * (k1 * Math.cos(l1 * tt) + k2 * Math.cos(l2 * tt));
+        }
+        const y1 = y10 + u1, y2 = y20 + u2;
+        p.b1.setAttribute('y', y1); p.b2.setAttribute('y', y2);
+        p.s1.setAttribute('points', V.springPts(p.x, 34, p.x, y1, 7, 9));
+        p.s2.setAttribute('points', V.springPts(p.x, y1 + 26, p.x, y2, 6, 8));
+      }
+    });
+  }
+
+  /* --- 3.4 кривая гасителя --- */
+  {
+    const svg = document.getElementById('svgAbs');
+    const x0 = 60, y0 = 16, w = 620, h = 240;
+    // параметры: m1=1, c1=1 (λ=1), гаситель m2=0.15, c2=0.15 (настроен на ω=1)
+    const m1 = 1, c1 = 1, m2 = 0.15, c2 = 0.15, zmax = 2, amax = 6;
+    V.el('rect', { x: x0, y: y0, width: w, height: h, fill: '#fff', stroke: '#d8d6cf' }, svg);
+    const X = (z) => x0 + z / zmax * w, Y = (a) => y0 + h - Math.min(a, amax) / amax * h;
+    [['0', 0], ['1', 1], ['2', 2]].forEach(([s, z]) =>
+      V.el('text', { x: X(z), y: y0 + h + 16, 'text-anchor': 'middle', class: 'lbl-axis' }, svg).textContent = s);
+    V.el('text', { x: x0 + w - 8, y: y0 + h - 8, 'text-anchor': 'end', class: 'lbl-axis' }, svg).textContent = 'ω/√(c₂/m₂)';
+    V.el('text', { x: x0 + 8, y: y0 + 16, class: 'lbl-axis' }, svg).textContent = '|a₁|·c₁/Q₀';
+    V.el('line', { x1: X(1), y1: y0, x2: X(1), y2: y0 + h, stroke: '#cfe4d6', 'stroke-dasharray': '5 4' }, svg);
+    // без гасителя: |1/(1−z²)|
+    const p0 = [];
+    for (let j = 0; j <= 600; j++) {
+      const z = zmax * j / 600, om2 = z * z;
+      p0.push(`${X(z).toFixed(1)},${Y(Math.abs(c1 / (c1 - m1 * om2))).toFixed(1)}`);
+    }
+    V.el('polyline', { points: p0.join(' '), fill: 'none', stroke: '#9a9aa2', 'stroke-width': 1.6, 'stroke-dasharray': '6 4' }, svg);
+    // с гасителем
+    const p1 = [];
+    for (let j = 0; j <= 800; j++) {
+      const z = zmax * j / 800, om2 = z * z;
+      const det = (c1 + c2 - m1 * om2) * (c2 - m2 * om2) - c2 * c2;
+      p1.push(`${X(z).toFixed(1)},${Y(Math.abs(c1 * (c2 - m2 * om2) / det)).toFixed(1)}`);
+    }
+    V.el('polyline', { points: p1.join(' '), fill: 'none', stroke: '#155e75', 'stroke-width': 2.2 }, svg);
+    V.el('circle', { cx: X(1), cy: Y(0), r: 5, fill: '#1a7f37' }, svg);
+    V.el('text', { x: X(1) + 8, y: Y(0) - 10, class: 'lbl', fill: '#1a7f37', 'font-size': 13.5 }, svg).textContent = 'a₁ = 0: настройка c₂/m₂ = ω²';
+    V.el('text', { x: X(0.62), y: Y(4.6), class: 'lbl', fill: '#155e75', 'font-size': 13 }, svg).textContent = 'новые резонансы';
+    V.el('text', { x: X(1.24), y: Y(4.6), class: 'lbl', fill: '#155e75', 'font-size': 13 }, svg).textContent = ' ';
+    V.el('text', { x: X(0.30), y: Y(1.7), class: 'lbl', fill: '#6b6b74', 'font-size': 13 }, svg).textContent = 'без гасителя';
+  }
+})();
+</script>
+</body>
+</html>

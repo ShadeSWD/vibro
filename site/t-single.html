@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Глава 2. Система с одной степенью свободы</title>
+<meta name="description" content="Вывод уравнения колебаний массы на пружине, свободные и затухающие колебания, логарифмический декремент, апериодическое движение, интеграл Дюамеля, вынужденные колебания и полный вывод коэффициента динамичности, резонансные кривые.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<main class="wrap">
+  <h1>Глава 2. Система с одной степенью свободы</h1>
+  <p class="lead">Груз на пружине — простейшая модель, на которой видна вся механика
+  вибрации: собственная частота, затухание, резонанс. Всё, что выведено здесь, дальше
+  дословно повторится для балок, пластин и корпуса — изменится лишь смысл «массы» и
+  «жёсткости».</p>
+  <p><a class="theory-link" href="theory">Оглавление</a>
+     <a class="theory-link" href="demo-m1">Модель М1: свободные колебания</a>
+     <a class="theory-link" href="demo-m2">Модель М2: резонанс</a></p>
+
+  <h2 id="eq">2.1. Вывод уравнения движения</h2>
+  <p>Груз массой M висит на пружине жёсткости C (сила пружины пропорциональна её
+  деформации: \(F_{\text{упр}} = C\Delta\)). Отсчитываем координату q от положения
+  <b>статического равновесия</b> — тогда сила тяжести и статическая деформация пружины
+  взаимно уничтожаются и в уравнение не входят. При отклонении q на груз действуют:</p>
+  <ul>
+    <li>восстанавливающая сила пружины \(-Cq\) (к равновесию);</li>
+    <li>сила сопротивления, принимаемая вязкой: \(-R\dot q\) (против скорости);</li>
+    <li>внешняя возмущающая сила \(Q(t)\).</li>
+  </ul>
+  <div class="panel" style="max-width:640px">
+    <svg viewBox="0 0 640 240" class="anim" id="svgScheme"></svg>
+    <div class="caption">Расчётная схема: масса, пружина C, демпфер R, сила Q(t);
+    координата q — от положения равновесия.</div>
+  </div>
+  <p>Второй закон Ньютона (или принцип Даламбера, добавляющий силу инерции
+  \(-M\ddot q\) к условию равновесия):</p>
+  <div class="formula">$$M\ddot q = -Cq - R\dot q + Q(t).$$</div>
+  <p>Делим на M и вводим стандартные обозначения
+  \(2\mu = R/M\), \(\lambda^2 = C/M\):</p>
+  <div class="formula key">$$\ddot q + 2\mu\dot q + \lambda^2 q = \frac{Q(t)}{M},
+    \qquad \lambda = \sqrt{\frac{C}{M}}.$$</div>
+  <p>Это <b>основное уравнение теории вибрации</b>: λ — собственная частота (рад/с),
+  μ — коэффициент затухания (1/с). Дальше разбираем его по частям: сначала свободные
+  колебания \((Q = 0)\), затем вынужденные.</p>
+
+  <h2 id="free">2.2. Свободные колебания без сопротивления</h2>
+  <p>При \(\mu = 0,\ Q = 0\): \(\ddot q + \lambda^2 q = 0\). Общее решение —</p>
+  <div class="formula">$$q = C_1\cos\lambda t + C_2\sin\lambda t = A\cos(\lambda t - \varepsilon).$$</div>
+  <p>Постоянные находим из начальных условий \(q(0) = q_0\), \(\dot q(0) = v_0\):
+  подстановка даёт \(C_1 = q_0\), \(C_2 = v_0/\lambda\), откуда амплитуда и начальная фаза</p>
+  <div class="formula">$$A = \sqrt{q_0^2 + \frac{v_0^2}{\lambda^2}}, \qquad
+    \operatorname{tg}\varepsilon = \frac{v_0}{\lambda q_0}.$$</div>
+  <p>Движение — гармоника с периодом \(T = 2\pi/\lambda\). Частота <b>не зависит</b> от
+  начальных условий — это свойство линейной системы: как ни толкни, период один и тот же.
+  Полная энергия \(\tfrac12 M\dot q^2 + \tfrac12 Cq^2 = \tfrac12 CA^2\) сохраняется,
+  перекачиваясь из кинетической в потенциальную дважды за период.
+  <a class="theory-link" href="demo-m1">Живая модель М1</a></p>
+
+  <h2 id="damped">2.3. Затухающие колебания. Декремент</h2>
+  <p>С сопротивлением \((\mu &gt; 0,\ Q = 0)\) ищем решение в виде \(q = e^{kt}\);
+  подстановка даёт характеристическое уравнение</p>
+  <div class="formula">$$k^2 + 2\mu k + \lambda^2 = 0, \qquad
+    k_{1,2} = -\mu \pm \sqrt{\mu^2 - \lambda^2}.$$</div>
+  <p><b>Случай слабого сопротивления</b> \(\mu^2 &lt; \lambda^2\) (все судовые конструкции).
+  Корни комплексные: \(k_{1,2} = -\mu \pm i\lambda'\), где</p>
+  <div class="formula key">$$q(t) = A\,e^{-\mu t}\cos(\lambda' t - \varepsilon), \qquad
+    \lambda' = \sqrt{\lambda^2 - \mu^2}.$$</div>
+  <p>Начальные условия \(q_0,\ v_0\) дают
+  \(A = \sqrt{q_0^2 + \bigl((v_0 + \mu q_0)/\lambda'\bigr)^2}\),
+  \(\operatorname{tg}\varepsilon = (v_0 + \mu q_0)/(\lambda' q_0)\).
+  Колебания происходят с чуть уменьшенной частотой λ′ внутри экспоненциальной огибающей
+  \(\pm Ae^{-\mu t}\). Отношение двух последовательных амплитуд одного знака (через условный
+  период \(T' = 2\pi/\lambda'\)) постоянно:</p>
+  <div class="formula">$$\frac{a_i}{a_{i+1}} = e^{\mu T'} = \text{const}, \qquad
+    \delta = \ln\frac{a_i}{a_{i+1}} = \mu T'$$</div>
+  <p>— амплитуды убывают в геометрической прогрессии, а δ называется
+  <b>логарифмическим декрементом</b> колебаний. Его удобно мерить по осциллограмме — и по
+  нему восстанавливать μ. Важно: затухание, заметно съедая амплитуду, почти не меняет
+  частоту:</p>
+  <table style="border-collapse:collapse;margin:12px 0;font-size:15px">
+    <tr style="border-bottom:1px solid #d8d6cf">
+      <th style="padding:4px 14px;text-align:left">μ/λ</th>
+      <td style="padding:4px 14px">0,05</td><td style="padding:4px 14px">0,1</td>
+      <td style="padding:4px 14px">0,2</td><td style="padding:4px 14px">0,3</td></tr>
+    <tr style="border-bottom:1px solid #d8d6cf">
+      <th style="padding:4px 14px;text-align:left">λ′/λ</th>
+      <td style="padding:4px 14px">0,9987</td><td style="padding:4px 14px">0,9950</td>
+      <td style="padding:4px 14px">0,9798</td><td style="padding:4px 14px">0,9539</td></tr>
+    <tr>
+      <th style="padding:4px 14px;text-align:left">за период амплитуда падает до</th>
+      <td style="padding:4px 14px">73 %</td><td style="padding:4px 14px">53 %</td>
+      <td style="padding:4px 14px">28 %</td><td style="padding:4px 14px">14 %</td></tr>
+  </table>
+  <p>Поэтому при расчёте собственных частот судовых конструкций затуханием пренебрегают
+  \((\lambda' \approx \lambda)\), а при расчёте резонансных амплитуд — нет.</p>
+  <p><b>Случай сильного сопротивления</b> \(\mu^2 &gt; \lambda^2\). Оба корня вещественны и
+  отрицательны:</p>
+  <div class="formula">$$q = e^{-\mu t}\left(C_1 e^{\sqrt{\mu^2-\lambda^2}\,t}
+    + C_2 e^{-\sqrt{\mu^2-\lambda^2}\,t}\right)$$</div>
+  <p>— движение <b>апериодическое</b>: выведенная из равновесия система сползает к нему,
+  ни разу его не перейдя (максимум один переход при большой начальной скорости).
+  Граница \(\mu = \lambda\) — критическое затухание, самый быстрый возврат к равновесию
+  (так настраивают демпферы измерительных приборов).</p>
+  <div class="panel" style="max-width:760px">
+    <svg viewBox="0 0 720 280" class="anim" id="svgDamp"></svg>
+    <div class="caption">Затухающие колебания (μ &lt; λ) в огибающей ±Ae<sup>−μt</sup>
+    и апериодическое движение (μ &gt; λ) при тех же начальных условиях.</div>
+  </div>
+  <p><a class="theory-link" href="demo-m1">Модель М1: оба режима, замер декремента</a></p>
+
+  <h2 id="duhamel">2.4. Произвольная сила: интеграл Дюамеля</h2>
+  <p>Реакцию на любую силу Q(t) можно собрать из откликов на элементарные импульсы
+  \(Q(\tau)d\tau\): каждый импульс сообщает массе скорость \(Q(\tau)d\tau/M\), после чего
+  система свободно затухает. Суммирование по всем импульсам даёт
+  <b>интеграл Дюамеля</b>:</p>
+  <div class="formula">$$q(t) = \frac{1}{M\lambda'}\int_0^t Q(\tau)\,
+    e^{-\mu(t-\tau)}\sin\lambda'(t-\tau)\,d\tau .$$</div>
+  <p>Им решают задачи об ударных нагрузках (слеминг, подрыв). Для главного судового
+  случая — периодической силы — удобнее прямой путь, к нему и переходим.</p>
+
+  <h2 id="forced">2.5. Вынужденные колебания. Вывод коэффициента динамичности</h2>
+  <p>Пусть \(Q = Q_0\sin\omega t\). Общее решение = свободные затухающие колебания
+  (переходный процесс, исчезает за несколько периодов) + частное решение —
+  <b>установившиеся вынужденные колебания</b>. Ищем частное решение с частотой силы:</p>
+  <div class="formula">$$q_\text{в} = B_1\sin\omega t + B_2\cos\omega t.$$</div>
+  <p>Подставляем в \(\ddot q + 2\mu\dot q + \lambda^2 q = (Q_0/M)\sin\omega t\).
+  Производные: \(\dot q_\text{в} = \omega(B_1\cos\omega t - B_2\sin\omega t)\),
+  \(\ddot q_\text{в} = -\omega^2 q_\text{в}\). Собирая коэффициенты при
+  \(\sin\omega t\) и \(\cos\omega t\) (равенство должно выполняться в любой момент,
+  значит по каждой из двух функций отдельно):</p>
+  <div class="formula">$$\begin{aligned}
+    (\lambda^2 - \omega^2)B_1 - 2\mu\omega B_2 &= \frac{Q_0}{M},\\
+    2\mu\omega B_1 + (\lambda^2 - \omega^2)B_2 &= 0.
+  \end{aligned}$$</div>
+  <p>Решение системы (определитель \(D = (\lambda^2 - \omega^2)^2 + 4\mu^2\omega^2\)):</p>
+  <div class="formula">$$B_1 = \frac{Q_0}{M}\cdot\frac{\lambda^2 - \omega^2}{D}, \qquad
+    B_2 = -\frac{Q_0}{M}\cdot\frac{2\mu\omega}{D}.$$</div>
+  <p>Переходим к амплитудной форме \(q_\text{в} = a\sin(\omega t - \varepsilon)\):</p>
+  <div class="formula">$$a = \sqrt{B_1^2 + B_2^2} = \frac{Q_0}{M\sqrt{D}}, \qquad
+    \operatorname{tg}\varepsilon = -\frac{B_2}{B_1} = \frac{2\mu\omega}{\lambda^2 - \omega^2}.$$</div>
+  <p>Амплитуду принято сравнивать со <b>статическим прогибом</b> — смещением под той же
+  силой, приложенной медленно: \(q_{\text{ст}} = Q_0/C = Q_0/(M\lambda^2)\). Их отношение —
+  <b>коэффициент динамичности</b>:</p>
+  <div class="formula key">$$\alpha = \frac{a}{q_{\text{ст}}} = \frac{\lambda^2}{\sqrt{D}}
+    = \frac{1}{\sqrt{\left(1 - \dfrac{\omega^2}{\lambda^2}\right)^{\!2}
+    + \dfrac{4\mu^2\omega^2}{\lambda^4}}}.$$</div>
+  <p>Свойства α как функции расстройки \(z = \omega/\lambda\):</p>
+  <ul>
+    <li>\(\omega \ll \lambda\): \(\alpha \to 1\) — сила действует квазистатически;</li>
+    <li>\(\omega \gg \lambda\): \(\alpha \to 0\) — масса «не успевает» за силой,
+    колебания исчезают;</li>
+    <li>максимум при \(\omega = \lambda\sqrt{1 - 2\mu^2/\lambda^2} \approx \lambda\) —
+    <b>резонанс</b>; высота пика \(\alpha_{\max} \approx \dfrac{\lambda}{2\mu} = \dfrac{\pi}{\delta}\)
+    ограничена только затуханием: при декременте δ = 0,1 усиление в ~30 раз;</li>
+    <li>фаза: ниже резонанса движение в фазе с силой \((\varepsilon \approx 0)\), в резонансе
+    отстаёт ровно на \(\pi/2\) (сила «в такт скорости» — идеальная накачка энергии),
+    выше — в противофазе \((\varepsilon \to \pi)\).</li>
+  </ul>
+  <div class="panel" style="max-width:760px">
+    <svg id="svgRez" class="anim" viewBox="0 0 720 300"></svg>
+    <div class="caption">Резонансные кривые α(ω/λ) при разных уровнях затухания μ/λ.</div>
+  </div>
+  <p>Практический вывод для судна: единственные надёжные способы снизить вынужденную
+  вибрацию — <b>отстройка от резонанса</b> (изменить λ жёсткостью или массой, изменить ω
+  оборотами) и уменьшение самой силы \(Q_0\) (балансировка, число лопастей); увеличение
+  затухания работает только вблизи резонанса.</p>
+  <p><a class="theory-link" href="demo-m2">Модель М2: резонансная кривая своими руками</a>
+     <a class="theory-link" href="t-two">Глава 3: несколько степеней свободы →</a></p>
+</main>
+<script src="assets/site.js" data-root="./" data-page="t-single"></script>
+<script src="assets/vibro.js"></script>
+<script>
+'use strict';
+(() => {
+  /* --- 2.1 расчётная схема --- */
+  {
+    const svg = document.getElementById('svgScheme');
+    // потолок
+    V.el('line', { x1: 140, y1: 30, x2: 400, y2: 30, stroke: '#16161a', 'stroke-width': 2.4 }, svg);
+    for (let x = 150; x <= 396; x += 16)
+      V.el('line', { x1: x, y1: 30, x2: x - 9, y2: 18, stroke: '#9a9aa2', 'stroke-width': 1.2 }, svg);
+    // пружина
+    V.el('polyline', { points: V.springPts(200, 30, 200, 140, 12),
+      fill: 'none', stroke: '#155e75', 'stroke-width': 2.2 }, svg);
+    V.el('text', { x: 152, y: 92, class: 'lbl', fill: '#155e75' }, svg).textContent = 'C';
+    // демпфер
+    V.el('line', { x1: 330, y1: 30, x2: 330, y2: 70, stroke: '#16161a', 'stroke-width': 2 }, svg);
+    V.el('path', { d: 'M 314 70 L 314 116 M 346 70 L 346 116 M 314 70 L 346 70', fill: 'none', stroke: '#16161a', 'stroke-width': 2 }, svg);
+    V.el('line', { x1: 316, y1: 100, x2: 344, y2: 100, stroke: '#16161a', 'stroke-width': 4 }, svg);
+    V.el('line', { x1: 330, y1: 100, x2: 330, y2: 140, stroke: '#16161a', 'stroke-width': 2 }, svg);
+    V.el('text', { x: 356, y: 96, class: 'lbl' }, svg).textContent = 'R';
+    // масса
+    V.el('rect', { x: 160, y: 140, width: 210, height: 56, rx: 8, fill: '#e7eef1', stroke: '#155e75', 'stroke-width': 2 }, svg);
+    V.el('text', { x: 265, y: 174, 'text-anchor': 'middle', class: 'lbl', 'font-size': 17 }, svg).textContent = 'M';
+    // сила Q(t)
+    V.el('line', { x1: 265, y1: 196, x2: 265, y2: 232, stroke: '#b3382e', 'stroke-width': 2.6, 'marker-end': 'url(#arrR)' }, svg);
+    V.el('text', { x: 276, y: 226, class: 'lbl', fill: '#b3382e' }, svg).textContent = 'Q(t)';
+    // координата q
+    V.el('line', { x1: 440, y1: 60, x2: 440, y2: 200, stroke: '#9a9aa2', 'stroke-width': 1.2 }, svg);
+    V.el('line', { x1: 432, y1: 168, x2: 448, y2: 168, stroke: '#16161a', 'stroke-width': 1.6 }, svg);
+    V.el('text', { x: 454, y: 172, class: 'lbl', 'font-size': 13, fill: '#6b6b74' }, svg).textContent = 'равновесие';
+    V.el('line', { x1: 440, y1: 168, x2: 440, y2: 118, stroke: '#1a7f37', 'stroke-width': 2.4, 'marker-end': 'url(#arrE)' }, svg);
+    V.el('text', { x: 448, y: 132, class: 'lbl', fill: '#1a7f37' }, svg).textContent = 'q';
+  }
+
+  /* --- 2.3 затухающие и апериодические --- */
+  {
+    const svg = document.getElementById('svgDamp');
+    const x0 = 56, y0 = 140, w = 640, h = 116;
+    V.el('rect', { x: x0, y: y0 - h, width: w, height: 2 * h, fill: '#fff', stroke: '#d8d6cf' }, svg);
+    V.el('line', { x1: x0, y1: y0, x2: x0 + w, y2: y0, stroke: '#ececec' }, svg);
+    V.el('text', { x: x0 + w - 6, y: y0 + 16, 'text-anchor': 'end', class: 'lbl-axis' }, svg).textContent = 't';
+    V.el('text', { x: x0 + 6, y: y0 - h + 18, class: 'lbl-axis' }, svg).textContent = 'q';
+    const T = 14, lam = 3.2, q0 = 1, v0 = 0;
+    const X = (t) => x0 + t / T * w, Y = (q) => y0 - q * (h - 14);
+    // огибающая
+    const mu1 = 0.35;
+    for (const s of [1, -1]) {
+      const pts = [];
+      for (let i = 0; i <= 200; i++) { const t = T * i / 200; pts.push(`${X(t).toFixed(1)},${Y(s * Math.exp(-mu1 * t)).toFixed(1)}`); }
+      V.el('polyline', { points: pts.join(' '), fill: 'none', stroke: '#9a9aa2', 'stroke-width': 1.2, 'stroke-dasharray': '5 4' }, svg);
+    }
+    // затухающая
+    {
+      const lp = Math.sqrt(lam * lam - mu1 * mu1), pts = [];
+      for (let i = 0; i <= 500; i++) {
+        const t = T * i / 500;
+        const q = Math.exp(-mu1 * t) * (q0 * Math.cos(lp * t) + (v0 + mu1 * q0) / lp * Math.sin(lp * t));
+        pts.push(`${X(t).toFixed(1)},${Y(q).toFixed(1)}`);
+      }
+      V.el('polyline', { points: pts.join(' '), fill: 'none', stroke: '#155e75', 'stroke-width': 2.2 }, svg);
+    }
+    // амплитуды a1, a2
+    const lp = Math.sqrt(lam * lam - mu1 * mu1), Tp = 2 * Math.PI / lp;
+    [0, 1].forEach((i) => {
+      const t = i * Tp, q = Math.exp(-mu1 * t);
+      V.el('line', { x1: X(t), y1: y0, x2: X(t), y2: Y(q), stroke: '#b3382e', 'stroke-width': 1.6 }, svg);
+      V.el('text', { x: X(t) + 5, y: Y(q) - 5, class: 'lbl', fill: '#b3382e', 'font-size': 13 }, svg).textContent = 'a' + (i + 1);
+    });
+    V.el('text', { x: X(2.2), y: Y(0.92), class: 'lbl', fill: '#6b6b74', 'font-size': 13 }, svg).textContent = '±A·e^(−μt)';
+    // апериодическая
+    {
+      const mu2 = 4.5, r = Math.sqrt(mu2 * mu2 - lam * lam);
+      const k1 = -mu2 + r, k2 = -mu2 - r;
+      const C2 = (v0 - k1 * q0) / (k2 - k1), C1 = q0 - C2, pts = [];
+      for (let i = 0; i <= 300; i++) {
+        const t = T * i / 300;
+        pts.push(`${X(t).toFixed(1)},${Y(C1 * Math.exp(k1 * t) + C2 * Math.exp(k2 * t)).toFixed(1)}`);
+      }
+      V.el('polyline', { points: pts.join(' '), fill: 'none', stroke: '#1a7f37', 'stroke-width': 2.2 }, svg);
+      V.el('text', { x: X(1.7), y: Y(0.28), class: 'lbl', fill: '#1a7f37', 'font-size': 13.5 }, svg).textContent = 'μ > λ: апериодическое';
+    }
+    V.el('text', { x: X(6.2), y: Y(-0.55), class: 'lbl', fill: '#155e75', 'font-size': 13.5 }, svg).textContent = 'μ < λ: затухающие колебания';
+  }
+
+  /* --- 2.5 резонансные кривые --- */
+  {
+    const svg = document.getElementById('svgRez');
+    const x0 = 60, y0 = 16, w = 620, h = 240, zmax = 3, amax = 6;
+    V.el('rect', { x: x0, y: y0, width: w, height: h, fill: '#fff', stroke: '#d8d6cf' }, svg);
+    const X = (z) => x0 + z / zmax * w, Y = (a) => y0 + h - Math.min(a, amax) / amax * h;
+    V.el('line', { x1: X(1), y1: y0, x2: X(1), y2: y0 + h, stroke: '#e6b8b4', 'stroke-dasharray': '5 4' }, svg);
+    V.el('line', { x1: x0, y1: Y(1), x2: x0 + w, y2: Y(1), stroke: '#ececec' }, svg);
+    [['0', 0], ['1', 1], ['2', 2], ['3', 3]].forEach(([s, z]) =>
+      V.el('text', { x: X(z), y: y0 + h + 16, 'text-anchor': 'middle', class: 'lbl-axis' }, svg).textContent = s);
+    V.el('text', { x: x0 + w - 8, y: y0 + h - 8, 'text-anchor': 'end', class: 'lbl-axis' }, svg).textContent = 'ω/λ';
+    V.el('text', { x: x0 + 8, y: y0 + 16, class: 'lbl-axis' }, svg).textContent = 'α';
+    const cols = ['#b3382e', '#e2a13b', '#1a7f37', '#155e75'];
+    [0.05, 0.1, 0.2, 0.4].forEach((mz, i) => {
+      const pts = [];
+      for (let j = 0; j <= 400; j++) {
+        const z = zmax * j / 400;
+        const a = 1 / Math.sqrt((1 - z * z) ** 2 + 4 * mz * mz * z * z);
+        pts.push(`${X(z).toFixed(1)},${Y(a).toFixed(1)}`);
+      }
+      V.el('polyline', { points: pts.join(' '), fill: 'none', stroke: cols[i], 'stroke-width': 2 }, svg);
+      V.el('text', { x: X(1) + 46 + i * 4, y: Y(1 / (2 * mz)) + (i === 3 ? -6 : 12), class: 'lbl', fill: cols[i], 'font-size': 13 }, svg)
+        .textContent = `μ/λ = ${V.fmt(mz, 2)}`;
+    });
+  }
+})();
+</script>
+</body>
+</html>

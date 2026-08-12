@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Глава 4. Колебания балок и рам</title>
+<meta name="description" content="Вывод уравнения колебаний балки EIw''''+mẅ=q, разделение переменных, формы и частоты при разных закреплениях, динамические функции ψ0 и ψ1, вынужденные колебания, неразрезные балки борта, рамы и графическое решение tg μ = th μ.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<main class="wrap">
+  <h1>Глава 4. Колебания балок и рам</h1>
+  <p class="lead">Судовой корпус собран из балок: шпангоуты, бимсы, стрингеры, кильсоны.
+  У балки бесконечно много степеней свободы — и бесконечный спектр собственных частот и
+  форм. Здесь выводится уравнение колебаний и решается для главных судовых случаев.</p>
+  <p><a class="theory-link" href="theory">Оглавление</a>
+     <a class="theory-link" href="demo-m4">Модель М4: линейка на вибростенде</a></p>
+
+  <h2 id="eq">4.1. Вывод уравнения колебаний балки</h2>
+  <p>Балка: погонная масса m (кг/м), жёсткость на изгиб EI, прогиб \(w(x,t)\), внешняя
+  погонная нагрузка \(q(x,t)\). Выделим элемент длиной dx и выпишем действующие на него
+  силы: перерезывающие силы N и N + dN по граням, изгибающие моменты M и M + dM,
+  нагрузка q·dx и — по принципу Даламбера — <b>сила инерции</b>
+  \(-m\,dx\,\ddot w\):</p>
+  <div class="panel" style="max-width:680px">
+    <svg viewBox="0 0 680 250" class="anim" id="svgElem"></svg>
+    <div class="caption">Элемент балки dx: перерезывающие силы, моменты, нагрузка и сила
+    инерции.</div>
+  </div>
+  <p>Сумма проекций на вертикаль и сумма моментов (с точностью до малых высшего порядка):</p>
+  <div class="formula">$$\frac{\partial N}{\partial x} = q - m\ddot w, \qquad
+    \frac{\partial M}{\partial x} = N .$$</div>
+  <p>Третье соотношение — закон упругого изгиба из сопротивления материалов:
+  \(M = EI\,w''\). Подставляя одно в другое
+  \(\bigl(\partial^2 M/\partial x^2 = \partial N/\partial x\bigr)\), получаем
+  <b>уравнение поперечных колебаний балки</b>:</p>
+  <div class="formula key">$$EI\,w''''(x,t) + m\,\ddot w(x,t) = q(x,t).$$</div>
+  <p>Это то же уравнение статического изгиба \(EIw'''' = q\), к нагрузке которого
+  добавлена распределённая сила инерции \(-m\ddot w\). При переменном сечении EI и m
+  остаются под знаками производных — этот случай решается энергетически
+  (<a href="t-energy#rayleigh">глава 6</a>).</p>
+
+  <h2 id="sep">4.2. Свободные колебания: разделение переменных</h2>
+  <p>Свободные колебания \((q = 0)\) ищем в виде «форма × гармоника»:</p>
+  <div class="formula">$$w(x,t) = W(x)\cos(\lambda t + \varepsilon).$$</div>
+  <p>Подстановка: \(\ddot w = -\lambda^2 w\), косинус сокращается, и для формы W(x)
+  остаётся обыкновенное дифференциальное уравнение — <b>уравнение форм колебаний</b>:</p>
+  <div class="formula key">$$W'''' - k^4 W = 0, \qquad k^4 = \frac{m\lambda^2}{EI}.$$</div>
+  <p>Характеристические числа \(\pm k,\ \pm ik\) дают общее решение через
+  тригонометрические и гиперболические функции:</p>
+  <div class="formula">$$W(x) = A\sin kx + B\cos kx + C\operatorname{sh} kx + D\operatorname{ch} kx .$$</div>
+  <p>Четыре постоянных определяются четырьмя граничными условиями (по два на каждом
+  конце):</p>
+  <table style="border-collapse:collapse;margin:12px 0;font-size:15px">
+    <tr style="border-bottom:1px solid #d8d6cf"><th style="padding:4px 14px;text-align:left">закрепление конца</th>
+      <th style="padding:4px 14px;text-align:left">условия</th><th style="padding:4px 14px;text-align:left">смысл</th></tr>
+    <tr style="border-bottom:1px solid #d8d6cf"><td style="padding:4px 14px">шарнирная опора</td>
+      <td style="padding:4px 14px">\(W = 0,\ W'' = 0\)</td><td style="padding:4px 14px">нет прогиба и момента</td></tr>
+    <tr style="border-bottom:1px solid #d8d6cf"><td style="padding:4px 14px">заделка</td>
+      <td style="padding:4px 14px">\(W = 0,\ W' = 0\)</td><td style="padding:4px 14px">нет прогиба и поворота</td></tr>
+    <tr><td style="padding:4px 14px">свободный конец</td>
+      <td style="padding:4px 14px">\(W'' = 0,\ W''' = 0\)</td><td style="padding:4px 14px">нет момента и перерезывающей силы</td></tr>
+  </table>
+  <p>Однородная система четырёх уравнений имеет ненулевое решение только при равенстве
+  нулю её определителя — это <b>частотное уравнение</b> относительно безразмерного
+  параметра \(\mu = kl\); каждому корню \(\mu_n\) отвечают частота и форма:</p>
+  <div class="formula key">$$\lambda_n = \frac{\mu_n^2}{l^2}\sqrt{\frac{EI}{m}}.$$</div>
+
+  <h2 id="ss">4.3. Свободно опёртая балка</h2>
+  <p>Балка длиной l на двух шарнирных опорах. Условия на левом конце:
+  \(W(0) = B + D = 0\) и \(W''(0) = k^2(-B + D) = 0\), откуда \(B = D = 0\).
+  На правом: \(W(l) = A\sin\mu + C\operatorname{sh}\mu = 0\) и
+  \(W''(l) = k^2(-A\sin\mu + C\operatorname{sh}\mu) = 0\); складывая,
+  \(2C\operatorname{sh}\mu = 0\), а \(\operatorname{sh}\mu \ne 0\) при \(\mu \ne 0\) —
+  значит \(C = 0\) и частотное уравнение просто:</p>
+  <div class="formula">$$\sin\mu = 0 \quad\Rightarrow\quad \mu_n = \pi n, \qquad
+    W_n(x) = \sin\frac{n\pi x}{l}, \qquad
+    \lambda_n = \frac{\pi^2 n^2}{l^2}\sqrt{\frac{EI}{m}}.$$</div>
+  <p>Формы — синусоиды с \(n - 1\) внутренними узлами; частоты растут как квадраты
+  номеров: 1 : 4 : 9 : … Чем выше тон, тем короче полуволна и тем «жёстче» балка себя
+  ведёт.</p>
+  <div class="panel" style="max-width:760px">
+    <svg id="svgBeam" class="anim" viewBox="0 0 720 330"></svg>
+    <div class="caption">Первые три тона шарнирно опёртой балки: 0, 1 и 2 внутренних узла;
+    частоты относятся как 1 : 4 : 9.</div>
+  </div>
+
+  <h2 id="other">4.4. Другие закрепления</h2>
+  <p>При прочих закреплениях постоянные не обнуляются так удачно и частотные уравнения
+  получаются трансцендентными. Для <b>консоли</b> (заделка — свободный конец; кронштейн,
+  мачта) раскрытие определителя даёт \(1 + \cos\mu\operatorname{ch}\mu = 0\); для
+  <b>свободной балки</b> (оба конца свободны — это корпус судна на воде!) —
+  \(\cos\mu\operatorname{ch}\mu = 1\). Сводка низших корней:</p>
+  <table style="border-collapse:collapse;margin:12px 0;font-size:15px">
+    <tr style="border-bottom:1px solid #d8d6cf"><th style="padding:4px 12px;text-align:left">закрепление</th>
+      <th style="padding:4px 12px;text-align:left">частотное уравнение</th>
+      <th style="padding:4px 12px">μ₁</th><th style="padding:4px 12px">μ₂</th><th style="padding:4px 12px">μ₃</th></tr>
+    <tr style="border-bottom:1px solid #d8d6cf"><td style="padding:4px 12px">шарнир — шарнир</td>
+      <td style="padding:4px 12px">\(\sin\mu = 0\)</td>
+      <td style="padding:4px 12px">π = 3,142</td><td style="padding:4px 12px">2π = 6,283</td><td style="padding:4px 12px">3π = 9,425</td></tr>
+    <tr style="border-bottom:1px solid #d8d6cf"><td style="padding:4px 12px">заделка — свободный (консоль)</td>
+      <td style="padding:4px 12px">\(\cos\mu\operatorname{ch}\mu = -1\)</td>
+      <td style="padding:4px 12px">1,875</td><td style="padding:4px 12px">4,694</td><td style="padding:4px 12px">7,855</td></tr>
+    <tr style="border-bottom:1px solid #d8d6cf"><td style="padding:4px 12px">заделка — шарнир</td>
+      <td style="padding:4px 12px">\(\operatorname{tg}\mu = \operatorname{th}\mu\)</td>
+      <td style="padding:4px 12px">3,927</td><td style="padding:4px 12px">7,069</td><td style="padding:4px 12px">10,210</td></tr>
+    <tr style="border-bottom:1px solid #d8d6cf"><td style="padding:4px 12px">заделка — заделка</td>
+      <td style="padding:4px 12px">\(\cos\mu\operatorname{ch}\mu = 1\)</td>
+      <td style="padding:4px 12px">4,730</td><td style="padding:4px 12px">7,853</td><td style="padding:4px 12px">10,996</td></tr>
+    <tr><td style="padding:4px 12px">свободный — свободный (корпус)</td>
+      <td style="padding:4px 12px">\(\cos\mu\operatorname{ch}\mu = 1\)</td>
+      <td style="padding:4px 12px">4,730</td><td style="padding:4px 12px">7,853</td><td style="padding:4px 12px">10,996</td></tr>
+  </table>
+  <p>Заделка — заделка и свободная балка имеют одинаковый спектр, но разные формы: у
+  свободной балки к упругой форме добавляются перемещения её как жёсткого тела, а сами
+  формы имеют минимум два узла (<a href="t-energy#hull">глава 6</a>).</p>
+  <div class="panel" style="max-width:760px">
+    <svg viewBox="0 0 720 250" class="anim" id="svgCant"></svg>
+    <div class="caption">Первые формы консоли (слева, μ₁ = 1,875; μ₂ = 4,694) и свободной
+    балки (справа, μ₁ = 4,730 — два узла).</div>
+  </div>
+
+  <h2 id="forced">4.5. Вынужденные колебания балки</h2>
+  <p>При гармонической нагрузке \(q(x,t) = q_1(x)\sin\omega t\) есть два пути:</p>
+  <ul>
+    <li><b>разложение по собственным формам</b>: \(w = \sum_n f_n(t) W_n(x)\); благодаря
+    ортогональности форм уравнение для каждой \(f_n\) — обычный осциллятор главы 2 со
+    своей частотой \(\lambda_n\) и своим коэффициентом динамичности; вблизи резонанса
+    доминирует одна форма;</li>
+    <li><b>прямое решение</b>: для установившихся колебаний \(w = w_1(x)\sin\omega t\)
+    форма \(w_1\) удовлетворяет \(EIw_1'''' - m\omega^2 w_1 = q_1(x)\) и граничным
+    условиям, в которые и входит возмущение. Кинематическое возбуждение опоры
+    \(w_1(0) = f\) — ровно так решается <a href="demo-m4">задача М4 о линейке на
+    вибростенде</a>: при переходе ω через собственную частоту форма перестраивается и
+    на линейке появляется узел.</li>
+  </ul>
+
+  <h2 id="psi">4.6. Динамические функции ψ₀ и ψ₁</h2>
+  <p>Для стержневых систем (рам, неразрезных балок) удобен метод перемещений. В статике
+  реакции стержня на единичные смещения концов известны: момент в заделке от единичного
+  поворота конца равен \(4EI/l\) (дальний конец заделан) или \(3EI/l\) (дальний конец
+  шарнирный). Если же конец стержня поворачивается <b>с частотой ω</b>, к упругим силам
+  добавляются распределённые силы инерции самого стержня, и реакции меняются. Решая
+  уравнение форм с условием единичного поворота конца, получаем <b>динамические
+  реакции</b> — статические, умноженные на функции частотного параметра
+  \(\mu = l\sqrt[4]{m\omega^2/EI}\):</p>
+  <div class="formula key">$$M_{\text{дин}} = \frac{4EI}{l}\,\psi_0(\mu), \qquad
+    \psi_0(\mu) = \frac{\mu}{4}\cdot
+    \frac{\sin\mu\operatorname{ch}\mu - \cos\mu\operatorname{sh}\mu}{1 - \cos\mu\operatorname{ch}\mu}
+    \quad\text{(дальний конец заделан)},$$</div>
+  <div class="formula key">$$M_{\text{дин}} = \frac{3EI}{l}\,\psi_1(\mu), \qquad
+    \psi_1(\mu) = \frac{2\mu}{3}\cdot
+    \frac{\sin\mu\operatorname{sh}\mu}{\sin\mu\operatorname{ch}\mu - \cos\mu\operatorname{sh}\mu}
+    \quad\text{(дальний конец шарнирный)}.$$</div>
+  <p>Свойства (видны на графике):</p>
+  <ul>
+    <li>при \(\omega \to 0\) (μ → 0) обе функции → 1: возвращаемся к статике;</li>
+    <li>с ростом частоты ψ падают — инерция стержня «съедает» жёсткость;</li>
+    <li>обращение ψ в <b>бесконечность</b> — собственная частота стержня с закреплённым
+    (по данному смещению) концом; обращение в <b>нуль</b> — собственная частота стержня
+    со свободным этим смещением. Например, ψ₁ = 0 при μ = π — это частота
+    шарнирно опёртой балки, а ψ₁ → ∞ при μ = 3,927 — частота балки «заделка — шарнир».</li>
+  </ul>
+  <div class="panel" style="max-width:760px">
+    <svg viewBox="0 0 720 300" class="anim" id="svgPsi"></svg>
+    <div class="caption">Динамические функции ψ₀(μ) и ψ₁(μ): единица в статике, нули и
+    полюсы на собственных частотах стержня.</div>
+  </div>
+
+  <h2 id="cont">4.7. Неразрезные балки борта</h2>
+  <p>Бортовой шпангоут идёт от днища до верхней палубы, опираясь по пути на платформы и
+  палубы: это <b>неразрезная балка</b> на промежуточных опорах. Собственные частоты
+  находят методом перемещений: неизвестные — углы поворота на опорах, уравнения —
+  равенство нулю суммарных моментных реакций на каждой опоре, причём реакции пролётов
+  берутся с динамическими функциями ψ (динамический аналог уравнения трёх моментов).
+  Раскрытие определителя даёт трансцендентное частотное уравнение.</p>
+  <p>Качественный результат: частота нижнего тона неразрезной балки лежит <b>между</b>
+  частотами однопролётной шарнирной и однопролётной заделанной балки той же длины пролёта
+  — соседние пролёты упруго защемляют друг друга (π &lt; μ₁ &lt; 4,73 в пересчёте на один
+  пролёт). Дробя пролёт промежуточными опорами (палубами, платформами), частоту поднимают
+  кратно — это главный способ отстройки местной вибрации борта.</p>
+  <div class="panel" style="max-width:720px">
+    <svg viewBox="0 0 720 260" class="anim" id="svgSide"></svg>
+    <div class="caption">Шпангоут как неразрезная балка: опоры — днище, платформа, палубы;
+    форма нижнего тона (пунктир) с перегибами над опорами.</div>
+  </div>
+
+  <h2 id="frames">4.8. Рамы. Уравнение tg μ = th μ</h2>
+  <p>Судовой набор образует <b>рамы</b>: шпангоут + бимс (+ флор). Метод тот же:
+  неизвестные — перемещения узлов (повороты φ и линейные смещения δ), для каждого
+  записываются суммарные единичные реакции рамы; обозначим \(\chi_0(\mu)\) — реакцию на
+  единичный поворот узла и \(\chi_1(\mu)\) — на единичное смещение ригеля. Они собираются
+  из динамических реакций стержней (функций ψ соответствующих закреплений), и частотное
+  уравнение — равенство нулю определителя из χ.</p>
+  <p><b>Простейшая рама</b>: стойка и ригель одинаковой длины l, жёсткости EI и погонной
+  массы m, жёстко соединённые в узле; дальние концы заделаны, линейным смещением узла
+  пренебрегаем. Единственное неизвестное — поворот узла φ; оба стержня сопротивляются ему
+  реакцией \((4EI/l)\psi_0(\mu)\), и частотное уравнение</p>
+  <div class="formula">$$\chi_0(\mu) = 2\cdot\frac{4EI}{l}\,\psi_0(\mu) = 0
+    \quad\Longleftrightarrow\quad
+    \sin\mu\operatorname{ch}\mu - \cos\mu\operatorname{sh}\mu = 0,$$</div>
+  <p>то есть, поделив на \(\cos\mu\operatorname{ch}\mu\):</p>
+  <div class="formula key">$$\operatorname{tg}\mu = \operatorname{th}\mu .$$</div>
+  <p>Уравнение решается <b>графически</b>: точки пересечения тангенсоиды с кривой
+  гиперболического тангенса (при μ &gt; 2 практически прямой th μ ≈ 1). Первый ненулевой
+  корень \(\mu_1 = 3{,}927\) (далее 7,069; 10,210 — почти \(\pi/4 + \pi n\)), низшая
+  частота рамы</p>
+  <div class="formula">$$\lambda_1 = \frac{\mu_1^2}{l^2}\sqrt{\frac{EI}{m}}
+    = \frac{15{,}42}{l^2}\sqrt{\frac{EI}{m}} .$$</div>
+  <div class="panel" style="max-width:760px">
+    <svg viewBox="0 0 720 320" class="anim" id="svgTg"></svg>
+    <div class="caption">Графическое решение tg μ = th μ: корни μ₁ = 3,927 и μ₂ = 7,069 —
+    пересечения ветвей тангенса с кривой th μ (сплошная зелёная).</div>
+  </div>
+  <p><a class="theory-link" href="t-plates">Глава 5: пластины →</a></p>
+</main>
+<script src="assets/site.js" data-root="./" data-page="t-beams"></script>
+<script src="assets/vibro.js"></script>
+<script>
+'use strict';
+(() => {
+  /* --- 4.1 элемент балки --- */
+  {
+    const svg = document.getElementById('svgElem');
+    const y = 130, x1 = 240, x2 = 420;
+    // балка целиком (тонко)
+    V.el('line', { x1: 60, y1: y, x2: 620, y2: y, stroke: '#d8d6cf', 'stroke-width': 6 }, svg);
+    // элемент
+    V.el('rect', { x: x1, y: y - 14, width: x2 - x1, height: 28, fill: 'rgba(21,94,117,.10)', stroke: '#155e75', 'stroke-width': 2 }, svg);
+    // размер dx
+    V.el('line', { x1: x1, y1: y + 44, x2: x2, y2: y + 44, class: 'ln-dim', stroke: '#16161a' }, svg);
+    V.el('text', { x: (x1 + x2) / 2, y: y + 62, 'text-anchor': 'middle', class: 'lbl' }, svg).textContent = 'dx';
+    // перерезывающие силы
+    V.el('line', { x1: x1, y1: y - 14, x2: x1, y2: y - 62, stroke: '#b3382e', 'stroke-width': 2.4, 'marker-end': 'url(#arrR)' }, svg);
+    V.el('text', { x: x1 - 30, y: y - 52, class: 'lbl', fill: '#b3382e' }, svg).textContent = 'N';
+    V.el('line', { x1: x2, y1: y + 14, x2: x2, y2: y + 62, stroke: '#b3382e', 'stroke-width': 2.4, 'marker-end': 'url(#arrR)' }, svg);
+    V.el('text', { x: x2 + 10, y: y + 56, class: 'lbl', fill: '#b3382e' }, svg).textContent = 'N + dN';
+    // моменты (дуги)
+    V.el('path', { d: `M ${x1 - 34} ${y - 26} A 30 30 0 0 0 ${x1 - 34} ${y + 26}`, fill: 'none', stroke: '#155e75', 'stroke-width': 2.2, 'marker-end': 'url(#arrB)' }, svg);
+    V.el('text', { x: x1 - 84, y: y + 6, class: 'lbl', fill: '#155e75' }, svg).textContent = 'M';
+    V.el('path', { d: `M ${x2 + 34} ${y + 26} A 30 30 0 0 0 ${x2 + 34} ${y - 26}`, fill: 'none', stroke: '#155e75', 'stroke-width': 2.2, 'marker-end': 'url(#arrB)' }, svg);
+    V.el('text', { x: x2 + 44, y: y + 6, class: 'lbl', fill: '#155e75' }, svg).textContent = 'M + dM';
+    // нагрузка q
+    for (let x = x1 + 15; x < x2; x += 30)
+      V.el('line', { x1: x, y1: y - 66, x2: x, y2: y - 22, stroke: '#1a7f37', 'stroke-width': 1.8, 'marker-end': 'url(#arrE)' }, svg);
+    V.el('line', { x1: x1 + 10, y1: y - 66, x2: x2 - 10, y2: y - 66, stroke: '#1a7f37', 'stroke-width': 1.6 }, svg);
+    V.el('text', { x: (x1 + x2) / 2, y: y - 76, 'text-anchor': 'middle', class: 'lbl', fill: '#1a7f37' }, svg).textContent = 'q·dx';
+    // сила инерции
+    V.el('line', { x1: (x1 + x2) / 2, y1: y, x2: (x1 + x2) / 2, y2: y + 84, stroke: '#16161a', 'stroke-width': 2.4, 'marker-end': 'url(#arrE)' }, svg);
+    V.el('text', { x: (x1 + x2) / 2 + 8, y: y + 82, class: 'lbl' }, svg).textContent = '−m·dx·ẅ (сила инерции)';
+    V.el('text', { x: 64, y: y - 20, class: 'lbl', 'font-size': 13.5, fill: '#6b6b74' }, svg).textContent = 'балка m, EI';
+  }
+
+  /* --- 4.3 формы шарнирной балки (анимация) --- */
+  {
+    const svg = document.getElementById('svgBeam');
+    const x0 = 60, w = 600, rows = [70, 170, 270], amp = [34, 26, 20];
+    const beams = rows.map((y, i) => {
+      const n = i + 1;
+      V.el('line', { x1: x0, y1: y, x2: x0 + w, y2: y, stroke: '#ececec' }, svg);
+      for (const xx of [x0, x0 + w])
+        V.el('path', { d: `M${xx},${y} l-9,16 h18 z`, fill: '#fff', stroke: '#16161a', 'stroke-width': 1.6 }, svg);
+      V.el('text', { x: x0 + w + 16, y: y + 5, class: 'lbl' }, svg).textContent = `n = ${n}`;
+      for (let k = 1; k < n; k++)
+        V.el('circle', { cx: x0 + w * k / n, cy: y, r: 4, fill: '#b3382e' }, svg);
+      return V.el('polyline', { fill: 'none', stroke: '#155e75', 'stroke-width': 3, 'stroke-linecap': 'round' }, svg);
+    });
+    V.loop((dt, t) => {
+      beams.forEach((pl, i) => {
+        const n = i + 1, om = 1.4 * n * n;
+        const A = amp[i] * Math.cos(om * t);
+        const pts = [];
+        for (let j = 0; j <= 100; j++) {
+          const xi = j / 100;
+          pts.push(`${(x0 + w * xi).toFixed(1)},${(rows[i] - A * Math.sin(n * Math.PI * xi)).toFixed(1)}`);
+        }
+        pl.setAttribute('points', pts.join(' '));
+      });
+    });
+  }
+
+  /* --- 4.4 формы консоли и свободной балки --- */
+  {
+    const svg = document.getElementById('svgCant');
+    const shape = (mu, xi, free) => {
+      // консоль: W = ch−cos − σ(sh−sin), σ = (ch μ + cos μ)/(sh μ + sin μ)
+      // свободная: W = ch+cos − σ(sh+sin), σ = (ch μ − cos μ)/(sh μ − sin μ)
+      const z = mu * xi;
+      if (!free) {
+        const s = (Math.cosh(mu) + Math.cos(mu)) / (Math.sinh(mu) + Math.sin(mu));
+        return (Math.cosh(z) - Math.cos(z) - s * (Math.sinh(z) - Math.sin(z)));
+      }
+      const s = (Math.cosh(mu) - Math.cos(mu)) / (Math.sinh(mu) - Math.sin(mu));
+      return (Math.cosh(z) + Math.cos(z) - s * (Math.sinh(z) + Math.sin(z)));
+    };
+    // консоль
+    {
+      const x0 = 70, w = 250, y = 130;
+      V.el('line', { x1: x0, y1: y - 90, x2: x0, y2: y + 90, stroke: '#16161a', 'stroke-width': 2.4 }, svg);
+      V.el('path', { d: V.hatch(x0, y + 90, x0, y - 90), stroke: '#9a9aa2', 'stroke-width': 1.1, fill: 'none' }, svg);
+      V.el('line', { x1: x0, y1: y, x2: x0 + w, y2: y, stroke: '#ececec' }, svg);
+      [[1.875, '#155e75', 'μ₁ = 1,875'], [4.694, '#b3382e', 'μ₂ = 4,694']].forEach(([mu, col, name], i) => {
+        const norm = Math.abs(shape(mu, 1, false)), pts = [];
+        for (let j = 0; j <= 100; j++) {
+          const xi = j / 100;
+          pts.push(`${(x0 + w * xi).toFixed(1)},${(y - 60 * shape(mu, xi, false) / norm).toFixed(1)}`);
+        }
+        V.el('polyline', { points: pts.join(' '), fill: 'none', stroke: col, 'stroke-width': 2.4 }, svg);
+        V.el('text', { x: x0 + 8, y: 36 + i * 20, class: 'lbl', fill: col, 'font-size': 13.5 }, svg).textContent = name;
+      });
+      V.el('text', { x: x0 + w / 2, y: 240, 'text-anchor': 'middle', class: 'lbl', 'font-size': 13.5, fill: '#6b6b74' }, svg).textContent = 'консоль';
+    }
+    // свободная балка
+    {
+      const x0 = 420, w = 250, y = 130, mu = 4.730;
+      V.el('line', { x1: x0, y1: y, x2: x0 + w, y2: y, stroke: '#ececec' }, svg);
+      const norm = Math.abs(shape(mu, 0, true)), pts = [];
+      const nodes = [];
+      let prev = shape(mu, 0, true);
+      for (let j = 0; j <= 200; j++) {
+        const xi = j / 200, v = shape(mu, xi, true);
+        pts.push(`${(x0 + w * xi).toFixed(1)},${(y - 55 * v / norm).toFixed(1)}`);
+        if (j && prev * v < 0) nodes.push(x0 + w * (xi - 0.5 / 200));
+        prev = v;
+      }
+      V.el('polyline', { points: pts.join(' '), fill: 'none', stroke: '#155e75', 'stroke-width': 2.6 }, svg);
+      nodes.forEach((nx) => V.el('circle', { cx: nx, cy: y, r: 4.5, fill: '#b3382e' }, svg));
+      V.el('text', { x: x0 + 8, y: 36, class: 'lbl', fill: '#155e75', 'font-size': 13.5 }, svg).textContent = 'μ₁ = 4,730 (два узла)';
+      V.el('text', { x: x0 + w / 2, y: 240, 'text-anchor': 'middle', class: 'lbl', 'font-size': 13.5, fill: '#6b6b74' }, svg).textContent = 'свободная балка (корпус)';
+    }
+  }
+
+  /* --- 4.6 график ψ0, ψ1 --- */
+  {
+    const svg = document.getElementById('svgPsi');
+    const x0 = 56, y0 = 14, w = 640, h = 250, muMax = 5.6, yMin = -3, yMax = 3;
+    V.el('rect', { x: x0, y: y0, width: w, height: h, fill: '#fff', stroke: '#d8d6cf' }, svg);
+    const X = (mu) => x0 + mu / muMax * w;
+    const Y = (v) => y0 + h * (yMax - v) / (yMax - yMin);
+    V.el('line', { x1: x0, y1: Y(0), x2: x0 + w, y2: Y(0), stroke: '#b9b9c0' }, svg);
+    V.el('line', { x1: x0, y1: Y(1), x2: x0 + w, y2: Y(1), stroke: '#ececec', 'stroke-dasharray': '4 4' }, svg);
+    V.el('text', { x: x0 + 6, y: Y(1) - 5, class: 'lbl-axis', 'font-size': 12 }, svg).textContent = '1';
+    for (let m = 1; m <= 5; m++) {
+      V.el('line', { x1: X(m), y1: Y(0) - 4, x2: X(m), y2: Y(0) + 4, stroke: '#16161a' }, svg);
+      V.el('text', { x: X(m), y: y0 + h + 16, 'text-anchor': 'middle', class: 'lbl-axis', 'font-size': 12.5 }, svg).textContent = m;
+    }
+    V.el('text', { x: x0 + w - 6, y: y0 + h + 16, 'text-anchor': 'end', class: 'lbl-axis' }, svg).textContent = 'μ';
+    const psi0 = (mu) => mu / 4 * (Math.sin(mu) * Math.cosh(mu) - Math.cos(mu) * Math.sinh(mu)) / (1 - Math.cos(mu) * Math.cosh(mu));
+    const psi1 = (mu) => 2 * mu / 3 * (Math.sin(mu) * Math.sinh(mu)) / (Math.sin(mu) * Math.cosh(mu) - Math.cos(mu) * Math.sinh(mu));
+    const drawFn = (fn, col) => {
+      let seg = [];
+      const flush = () => {
+        if (seg.length > 1) V.el('polyline', { points: seg.join(' '), fill: 'none', stroke: col, 'stroke-width': 2.2 }, svg);
+        seg = [];
+      };
+      let prev = null;
+      for (let j = 1; j <= 800; j++) {
+        const mu = muMax * j / 800;
+        let v = fn(mu);
+        if (!isFinite(v) || Math.abs(v) > 40 || (prev !== null && Math.abs(v - prev) > 8)) { flush(); prev = v; continue; }
+        prev = v;
+        if (v > yMax || v < yMin) { flush(); continue; }
+        seg.push(`${X(mu).toFixed(1)},${Y(v).toFixed(1)}`);
+      }
+      flush();
+    };
+    drawFn(psi0, '#155e75');
+    drawFn(psi1, '#b3382e');
+    // отметки нулей и полюсов
+    V.el('circle', { cx: X(Math.PI), cy: Y(0), r: 4, fill: '#b3382e' }, svg);
+    V.el('text', { x: X(Math.PI) - 4, y: Y(0) + 18, class: 'lbl', fill: '#b3382e', 'font-size': 12.5 }, svg).textContent = 'π';
+    V.el('circle', { cx: X(3.927), cy: Y(0), r: 4, fill: '#155e75' }, svg);
+    V.el('text', { x: X(3.927) - 10, y: Y(0) + 18, class: 'lbl', fill: '#155e75', 'font-size': 12.5 }, svg).textContent = '3,93';
+    V.el('text', { x: X(1.1), y: Y(1.55), class: 'lbl', fill: '#155e75', 'font-size': 14 }, svg).textContent = 'ψ₀';
+    V.el('text', { x: X(2.05), y: Y(0.45), class: 'lbl', fill: '#b3382e', 'font-size': 14 }, svg).textContent = 'ψ₁';
+  }
+
+  /* --- 4.7 борт: неразрезная балка --- */
+  {
+    const svg = document.getElementById('svgSide');
+    const bx = 200, top = 30, bot = 230;
+    // борт (вертикальная балка-шпангоут)
+    V.el('line', { x1: bx, y1: top, x2: bx, y2: bot, stroke: '#16161a', 'stroke-width': 4 }, svg);
+    // опоры: днище (заделка), платформа, две палубы
+    const sup = [
+      { y: bot, name: 'днище (флор)', fix: true },
+      { y: 170, name: 'платформа' },
+      { y: 100, name: 'нижняя палуба' },
+      { y: top, name: 'верхняя палуба' },
+    ];
+    for (const s of sup) {
+      if (s.fix) {
+        V.el('line', { x1: bx - 26, y1: s.y, x2: bx + 26, y2: s.y, stroke: '#16161a', 'stroke-width': 2.2 }, svg);
+        V.el('path', { d: V.hatch(bx - 26, s.y, bx + 26, s.y), stroke: '#9a9aa2', 'stroke-width': 1.1, fill: 'none' }, svg);
+      } else {
+        V.el('line', { x1: bx, y1: s.y, x2: bx + 120, y2: s.y, stroke: '#6b6b74', 'stroke-width': 2.4 }, svg);
+        V.el('path', { d: `M${bx},${s.y} l-14,10 h28 z`, fill: '#fff', stroke: '#16161a', 'stroke-width': 1.5, transform: `rotate(-90 ${bx} ${s.y})` }, svg);
+      }
+      V.el('text', { x: bx + 132, y: s.y + 5, class: 'lbl', 'font-size': 13.5, fill: '#6b6b74' }, svg).textContent = s.name;
+    }
+    // форма нижнего тона (качественно): полуволны между опорами с чередованием знака
+    const segs = [[bot, 170], [170, 100], [100, top]];
+    let sgn = 1;
+    const pts = [];
+    for (const [ya, yb] of segs) {
+      for (let j = 0; j <= 40; j++) {
+        const t = j / 40, y = ya + (yb - ya) * t;
+        pts.push(`${(bx + sgn * 34 * Math.sin(Math.PI * t)).toFixed(1)},${y.toFixed(1)}`);
+      }
+      sgn = -sgn;
+    }
+    V.el('polyline', { points: pts.join(' '), fill: 'none', stroke: '#b3382e', 'stroke-width': 2, 'stroke-dasharray': '7 5' }, svg);
+    V.el('text', { x: 30, y: 60, class: 'lbl', fill: '#b3382e', 'font-size': 13.5 }, svg).textContent = 'форма';
+    V.el('text', { x: 30, y: 78, class: 'lbl', fill: '#b3382e', 'font-size': 13.5 }, svg).textContent = 'нижнего тона';
+    V.el('text', { x: 430, y: 226, class: 'lbl', 'font-size': 13.5, fill: '#6b6b74' }, svg).textContent = 'каждая палуба-опора поднимает частоту';
+  }
+
+  /* --- 4.8 графическое решение tg μ = th μ --- */
+  {
+    const svg = document.getElementById('svgTg');
+    const x0 = 56, y0 = 14, w = 640, h = 260, muMax = 8.2, yMin = -3, yMax = 3;
+    V.el('rect', { x: x0, y: y0, width: w, height: h, fill: '#fff', stroke: '#d8d6cf' }, svg);
+    const X = (mu) => x0 + mu / muMax * w;
+    const Y = (v) => y0 + h * (yMax - v) / (yMax - yMin);
+    V.el('line', { x1: x0, y1: Y(0), x2: x0 + w, y2: Y(0), stroke: '#b9b9c0' }, svg);
+    for (let m = 1; m <= 8; m++) {
+      V.el('line', { x1: X(m), y1: Y(0) - 4, x2: X(m), y2: Y(0) + 4, stroke: '#16161a' }, svg);
+      V.el('text', { x: X(m), y: y0 + h + 16, 'text-anchor': 'middle', class: 'lbl-axis', 'font-size': 12.5 }, svg).textContent = m;
+    }
+    V.el('text', { x: x0 + w - 6, y: y0 + h + 16, 'text-anchor': 'end', class: 'lbl-axis' }, svg).textContent = 'μ';
+    // асимптоты тангенса
+    [Math.PI / 2, 3 * Math.PI / 2, 5 * Math.PI / 2].forEach((a) =>
+      V.el('line', { x1: X(a), y1: y0, x2: X(a), y2: y0 + h, stroke: '#ececec', 'stroke-dasharray': '4 4' }, svg));
+    // tg μ ветвями
+    {
+      let seg = [];
+      const flush = () => { if (seg.length > 1) V.el('polyline', { points: seg.join(' '), fill: 'none', stroke: '#155e75', 'stroke-width': 2 }, svg); seg = []; };
+      for (let j = 0; j <= 900; j++) {
+        const mu = muMax * j / 900, v = Math.tan(mu);
+        if (Math.abs(v) > yMax * 1.6) { flush(); continue; }
+        if (v > yMax || v < yMin) { flush(); continue; }
+        seg.push(`${X(mu).toFixed(1)},${Y(v).toFixed(1)}`);
+      }
+      flush();
+    }
+    // th μ
+    {
+      const pts = [];
+      for (let j = 0; j <= 300; j++) {
+        const mu = muMax * j / 300;
+        pts.push(`${X(mu).toFixed(1)},${Y(Math.tanh(mu)).toFixed(1)}`);
+      }
+      V.el('polyline', { points: pts.join(' '), fill: 'none', stroke: '#1a7f37', 'stroke-width': 2.6 }, svg);
+    }
+    // корни
+    [[3.9266, 'μ₁ = 3,927'], [7.0686, 'μ₂ = 7,069']].forEach(([mu, name]) => {
+      const v = Math.tanh(mu);
+      V.el('circle', { cx: X(mu), cy: Y(v), r: 5, fill: '#b3382e' }, svg);
+      V.el('line', { x1: X(mu), y1: Y(v), x2: X(mu), y2: Y(0), stroke: '#b3382e', 'stroke-width': 1.2, 'stroke-dasharray': '4 3' }, svg);
+      V.el('text', { x: X(mu) - 34, y: Y(v) - 12, class: 'lbl', fill: '#b3382e', 'font-size': 13.5 }, svg).textContent = name;
+    });
+    V.el('text', { x: X(0.55), y: Y(2.1), class: 'lbl', fill: '#155e75', 'font-size': 14 }, svg).textContent = 'tg μ';
+    V.el('text', { x: X(1.7), y: Y(1.28), class: 'lbl', fill: '#1a7f37', 'font-size': 14 }, svg).textContent = 'th μ';
+  }
+})();
+</script>
+</body>
+</html>
