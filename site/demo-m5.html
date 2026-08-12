@@ -25,6 +25,7 @@
       <label>c₁=c₂, кН/м <input type="range" id="sC" min="20" max="300" step="5" value="100" data-d="0"> <span class="val" data-for="sC"></span></label>
       <label>A дороги, м <input type="range" id="sA" min="0" max="0.3" step="0.01" value="0.2"> <span class="val" data-for="sA"></span></label>
       <label>λ дороги, м <input type="range" id="sLam" min="5" max="30" step="0.5" value="15" data-d="1"> <span class="val" data-for="sLam"></span></label>
+      <label>амортизаторы k_д, Н·с/м <input type="range" id="sKd" min="0" max="12000" step="500" value="4000" data-d="0"> <span class="val" data-for="sKd"></span></label>
       <button class="btn on" id="bSin">Синус</button>
       <button class="btn" id="bRnd">Случайная дорога</button>
       <button class="btn" id="bReseed">Новые бугры</button>
@@ -64,7 +65,7 @@
 <script>
 'use strict';
 (() => {
-  const P = { m: 1000, L: 5, a: 2.5, b: 2.5, c: 1e5, v: 10, A: 0.2, lam: 15, road: 'sin' };
+  const P = { m: 1000, L: 5, a: 2.5, b: 2.5, c: 1e5, kd: 4000, v: 10, A: 0.2, lam: 15, road: 'sin' };
   P.rho = Math.sqrt(P.a * P.b);
   const R_WHEEL = 0.3;
   const DT = 0.004;             // шаг РК4, с (≤ 0,005)
@@ -110,10 +111,17 @@
   /* ---------- динамика: РК4 ---------- */
   const st = { x: 0, q1: 0, q2: 0, v1: 0, v2: 0, t: 0, acc: 0 };
   function deriv(x, q1, q2, v1, v2) {
-    const { m, a, b, c, rho } = P;
+    const { m, a, b, c, kd, rho } = P;
     const y1 = roadAt(P.L + x), y2 = roadAt(x); // y1 — переднее, y2 — заднее колесо
     const d1 = q1 + b * q2 - y1, d2 = q1 - a * q2 - y2;
-    return [v1, v2, -(c * d1 + c * d2) / m, -(c * b * d1 - c * a * d2) / (m * rho * rho)];
+    // скорости деформаций подвески: ẏ = v·road′(s) численно
+    const eps = 0.02;
+    const yd1 = P.v * (roadAt(P.L + x + eps) - roadAt(P.L + x - eps)) / (2 * eps);
+    const yd2 = P.v * (roadAt(x + eps) - roadAt(x - eps)) / (2 * eps);
+    const g1 = v1 + b * v2 - yd1, g2 = v1 - a * v2 - yd2;
+    return [v1, v2,
+      -(c * d1 + c * d2 + kd * g1 + kd * g2) / m,
+      -(c * b * d1 - c * a * d2 + kd * b * g1 - kd * a * g2) / (m * rho * rho)];
   }
   function rk4step(dt) {
     const { q1, q2, v1, v2, x } = st;
@@ -277,9 +285,13 @@
   function steps() {
     document.getElementById('steps').innerHTML = `
     <div class="step"><span class="f">Уравнения движения (кинематическое возмущение от дороги):</span><br>
-      <span class="res">m·q̈₁ + c₁(q₁ + b·q₂ − y₁) + c₂(q₁ − a·q₂ − y₂) = 0</span><br>
-      <span class="res">m·ρ²·q̈₂ + c₁·b·(q₁ + b·q₂ − y₁) − c₂·a·(q₁ − a·q₂ − y₂) = 0</span>
-      <span class="cmnt">y₁ = road(L + x(t)), y₂ = road(x(t)), x(t) = v·t — след колёс</span></div>
+      <span class="res">m·q̈₁ + k_д(ġ₁ + ġ₂) + c₁(q₁ + b·q₂ − y₁) + c₂(q₁ − a·q₂ − y₂) = 0</span><br>
+      <span class="res">m·ρ²·q̈₂ + k_д(b·ġ₁ − a·ġ₂) + c₁·b·(q₁ + b·q₂ − y₁) − c₂·a·(q₁ − a·q₂ − y₂) = 0</span>
+      <span class="cmnt">y₁ = road(L + x(t)), y₂ = road(x(t)), x(t) = v·t — след колёс;
+      ġᵢ — скорости деформаций подвески. Демпферы k_д — амортизаторы: без них
+      (k_д = 0 — консервативная модель учебного расчёта) любое возмущение
+      колеблется вечно; с ними переходные затухают, и на ровной дороге машина
+      успокаивается.</span></div>
     <div class="step"><span class="f">Радиус инерции: ρ = √(ab)</span>
       <span class="sub">= √(${f(P.a, 1)}·${f(P.b, 1)})</span>
       <span class="res">= ${f(P.rho, 2)} м</span></div>
@@ -299,6 +311,7 @@
   V.slider('sC', (v) => { P.c = v * 1000; updateRez(); steps(); });
   V.slider('sA', (v) => { P.A = v; updateRez(); steps(); });
   V.slider('sLam', (v) => { P.lam = v; updateRez(); steps(); });
+  V.slider('sKd', (v) => { P.kd = v; steps(); });
   const bSin = document.getElementById('bSin'), bRnd = document.getElementById('bRnd');
   bSin.onclick = () => { P.road = 'sin'; bSin.classList.add('on'); bRnd.classList.remove('on'); updateRez(); };
   bRnd.onclick = () => { P.road = 'rnd'; bRnd.classList.add('on'); bSin.classList.remove('on'); updateRez(); };
@@ -330,15 +343,15 @@
     // 1) эталон: ω = 2πv/λ при v=10, λ=15
     const w = 2 * Math.PI * 10 / 15;
     // 2) проверка РК4: ровная дорога, q1(0)=0,1 — через период T=2π/√(2c/m) должно вернуться
-    const keep = { ...st }, keepP = { A: P.A, road: P.road };
-    P.A = 0; P.road = 'sin';
+    const keep = { ...st }, keepP = { A: P.A, road: P.road, kd: P.kd };
+    P.A = 0; P.road = 'sin'; P.kd = 0;
     Object.assign(st, { x: 0, q1: 0.1, q2: 0, v1: 0, v2: 0, t: 0, acc: 0 });
     const T = 2 * Math.PI / Math.sqrt(2 * P.c / P.m);
     const steps4 = Math.round(T / DT);
     const dtEx = T / steps4;
     for (let i = 0; i < steps4; i++) rk4step(dtEx);
     const q1T = st.q1;
-    Object.assign(st, keep); P.A = keepP.A; P.road = keepP.road;
+    Object.assign(st, keep); P.A = keepP.A; P.road = keepP.road; P.kd = keepP.kd;
     V.selfcheck('m5', [
       ['ω=2πv/λ', w, 4.18879, 1e-5],
       ['ρ=√(ab)', P.rho, 2.5, 1e-12],
