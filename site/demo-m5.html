@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>М5. Автомобиль по неровной дороге</title>
+<meta name="description" content="Живая модель автомобиля с двумя степенями свободы (подпрыгивание и галопирование) на синусоидальной и случайной дороге. Интегрирование Рунге–Куттой прямо в браузере.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<main class="wrap">
+  <h1>М5. Автомобиль по неровной дороге</h1>
+  <p class="lead">Кузов массой m = 1000 кг на двух упругих подвесках — система с двумя степенями
+  свободы: вертикальное перемещение q₁ (подпрыгивание) и поворот q₂ (галопирование). Дорога
+  задаёт кинематическое возмущение под каждым колесом; уравнения интегрируются методом
+  Рунге–Кутты 4-го порядка прямо в кадре анимации. Разгоняйтесь — и поймайте резонансную
+  скорость.</p>
+  <p><a class="theory-link" href="theory#t5">Системы с 2 степенями свободы</a>
+     <a class="theory-link" href="theory#t4">Резонанс</a></p>
+
+  <div class="panel">
+    <svg id="scene" class="anim" viewBox="0 0 960 360"></svg>
+    <div class="controls">
+      <label>v, м/с <input type="range" id="sV" min="0" max="40" step="0.5" value="10" data-d="1"> <span class="val" data-for="sV"></span></label>
+      <label>c₁=c₂, кН/м <input type="range" id="sC" min="20" max="300" step="5" value="100" data-d="0"> <span class="val" data-for="sC"></span></label>
+      <label>A дороги, м <input type="range" id="sA" min="0" max="0.3" step="0.01" value="0.2"> <span class="val" data-for="sA"></span></label>
+      <label>λ дороги, м <input type="range" id="sLam" min="5" max="30" step="0.5" value="15" data-d="1"> <span class="val" data-for="sLam"></span></label>
+      <button class="btn on" id="bSin">Синус</button>
+      <button class="btn" id="bRnd">Случайная дорога</button>
+      <button class="btn" id="bReseed">Новые бугры</button>
+      <span class="badge ok" id="wBadge"></span>
+    </div>
+    <div class="caption">Вертикальный масштаб неровностей и колебаний увеличен в 2,5 раза,
+    чтобы движение было видно.</div>
+  </div>
+
+  <div class="panel">
+    <div class="boards">
+      <div style="flex:2 1 480px"><svg id="graph" class="anim" viewBox="0 0 660 320"></svg>
+        <div class="legend"><span><span class="sw" style="background:#155e75"></span>q₁(t), м — подпрыгивание</span>
+          <span><span class="sw" style="background:#b3382e"></span>q₂(t), рад — галопирование</span></div></div>
+      <div style="flex:1 1 320px"><svg id="rez" class="anim" viewBox="0 0 420 320"></svg>
+        <div class="caption" id="rezCap"></div></div>
+    </div>
+  </div>
+
+  <h2>Решение по шагам</h2>
+  <p class="small">Серым — подстановка текущих значений, жирным — результат. Параметры и
+  постановка — из Mathcad-моделей <code>automobile</code> и <code>automobile_on_the_road</code>.</p>
+  <div class="steps" id="steps"></div>
+
+  <div class="note tip"><b>Резонанс по скорости.</b> Частота наезда на волны дороги
+  ω = 2πv/λ растёт со скоростью. Когда она сравняется с собственной частотой
+  √(2c/m) = 14,1 рад/с, машину начинает сильно раскачивать: при λ = 15 м это v ≈ 33,8 м/с
+  (122 км/ч). Проверьте ползунком: до резонанса кузов «повторяет дорогу», после — плывёт почти
+  ровно (виброизоляция). А при λ, кратной базе L, волны попадают под оба колеса синфазно —
+  галопирование q₂ почти не возбуждается.</div>
+
+  <p class="verified">Сверено с Mathcad-моделью кафедры (automobile_on_the_road):
+  ω = 2πv/λ = 4,18879 рад/с при v = 10, λ = 15; ρ = √(ab) = 2,5 м; РК4 с шагом 0,004 с ≤ 0,005 с.</p>
+</main>
+<script src="assets/site.js" data-root="./" data-page="demo-m5"></script>
+<script src="assets/vibro.js"></script>
+<script>
+'use strict';
+(() => {
+  const P = { m: 1000, L: 5, a: 2.5, b: 2.5, c: 1e5, v: 10, A: 0.2, lam: 15, road: 'sin' };
+  P.rho = Math.sqrt(P.a * P.b);
+  const R_WHEEL = 0.3;
+  const DT = 0.004;             // шаг РК4, с (≤ 0,005)
+
+  /* ---------- дорога ---------- */
+  let seed = 20260812, rndRoad = null;
+  function buildRandomRoad() {
+    const rnd = V.rng(seed);
+    const xs = [0], ys = [0];
+    let x = 0;
+    while (x < 600) {
+      x += P.L / 5 + rnd() * (P.L / 2 - P.L / 5); // расстояния U(L/5, L/2)
+      xs.push(x); ys.push((rnd() * 2 - 1) * 0.1); // высоты U(−0,1, 0,1)
+    }
+    ys[0] = ys[ys.length - 1] = 0;
+    const period = x;
+    rndRoad = { xs, ys, period };
+  }
+  function roadAt(s) {
+    if (P.road === 'sin') return P.A * Math.sin(2 * Math.PI * s / P.lam);
+    // случайная: сглаживание Кэтмулла–Рома (кубический сплайн) по буграм
+    const { xs, ys, period } = rndRoad;
+    let sm = s % period; if (sm < 0) sm += period;
+    let i = 0, j = xs.length - 1;
+    while (j - i > 1) { const mid = (i + j) >> 1; if (xs[mid] <= sm) i = mid; else j = mid; }
+    const n = xs.length;
+    const get = (k) => {
+      if (k < 0) return { x: xs[k + n - 1] - period, y: ys[k + n - 1] };
+      if (k >= n) return { x: xs[k - n + 1] + period, y: ys[k - n + 1] };
+      return { x: xs[k], y: ys[k] };
+    };
+    const p0 = get(i - 1), p1 = get(i), p2 = get(i + 1), p3 = get(i + 2);
+    const t = (sm - p1.x) / (p2.x - p1.x);
+    const m1 = (p2.y - p0.y) / (p2.x - p0.x) * (p2.x - p1.x);
+    const m2 = (p3.y - p1.y) / (p3.x - p1.x) * (p2.x - p1.x);
+    const t2 = t * t, t3 = t2 * t;
+    const y = (2 * t3 - 3 * t2 + 1) * p1.y + (t3 - 2 * t2 + t) * m1
+            + (-2 * t3 + 3 * t2) * p2.y + (t3 - t2) * m2;
+    return y * (P.A / 0.2); // масштаб высот вместе с ползунком A
+  }
+  buildRandomRoad();
+
+  /* ---------- динамика: РК4 ---------- */
+  const st = { x: 0, q1: 0, q2: 0, v1: 0, v2: 0, t: 0, acc: 0 };
+  function deriv(x, q1, q2, v1, v2) {
+    const { m, a, b, c, rho } = P;
+    const y1 = roadAt(P.L + x), y2 = roadAt(x); // y1 — переднее, y2 — заднее колесо
+    const d1 = q1 + b * q2 - y1, d2 = q1 - a * q2 - y2;
+    return [v1, v2, -(c * d1 + c * d2) / m, -(c * b * d1 - c * a * d2) / (m * rho * rho)];
+  }
+  function rk4step(dt) {
+    const { q1, q2, v1, v2, x } = st;
+    const vx = P.v;
+    const k1 = deriv(x, q1, q2, v1, v2);
+    const k2 = deriv(x + vx * dt / 2, q1 + k1[0] * dt / 2, q2 + k1[1] * dt / 2, v1 + k1[2] * dt / 2, v2 + k1[3] * dt / 2);
+    const k3 = deriv(x + vx * dt / 2, q1 + k2[0] * dt / 2, q2 + k2[1] * dt / 2, v1 + k2[2] * dt / 2, v2 + k2[3] * dt / 2);
+    const k4 = deriv(x + vx * dt, q1 + k3[0] * dt, q2 + k3[1] * dt, v1 + k3[2] * dt, v2 + k3[3] * dt);
+    st.q1 += dt / 6 * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]);
+    st.q2 += dt / 6 * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1]);
+    st.v1 += dt / 6 * (k1[2] + 2 * k2[2] + 2 * k3[2] + k4[2]);
+    st.v2 += dt / 6 * (k1[3] + 2 * k2[3] + 2 * k3[3] + k4[3]);
+    st.x += vx * dt;
+    st.t += dt;
+  }
+
+  /* ---------- сцена ---------- */
+  const scene = document.getElementById('scene');
+  const S = 55, KV = 2.5, SV = S * KV; // масштабы: гориз. и вертик. (с преувеличением)
+  const XREAR = 260, YG = 300;         // экран: заднее колесо и уровень дороги
+  V.el('rect', { x: 0, y: 0, width: 960, height: 360, fill: '#eef4f6' }, scene);
+  V.el('circle', { cx: 850, cy: 60, r: 28, fill: '#f5e6b8', stroke: 'none' }, scene); // солнце
+  const roadFill = V.el('path', { fill: '#d8d6cf' }, scene);
+  const roadLine = V.el('polyline', { fill: 'none', stroke: '#16161a', 'stroke-width': 2.5 }, scene);
+  const gCar = V.el('g', {}, scene);
+  // колёса (отдельно от кузова — держатся дороги)
+  function mkWheel() {
+    const g = V.el('g', {}, gCar);
+    const rot = V.el('g', {}, g);
+    V.el('circle', { r: R_WHEEL * S, fill: '#2c2c31', stroke: '#16161a', 'stroke-width': 2 }, rot);
+    V.el('circle', { r: R_WHEEL * S * 0.55, fill: '#6b6b74' }, rot);
+    for (let i = 0; i < 5; i++) {
+      const an = i * 2 * Math.PI / 5;
+      V.el('line', {
+        x1: 0, y1: 0, x2: Math.cos(an) * R_WHEEL * S * 0.55, y2: Math.sin(an) * R_WHEEL * S * 0.55,
+        stroke: '#eceae3', 'stroke-width': 2.5,
+      }, rot);
+    }
+    V.el('circle', { r: 3.2, fill: '#eceae3' }, rot);
+    return { g, rot };
+  }
+  const wRear = mkWheel(), wFront = mkWheel();
+  const sprRear = V.el('polyline', { fill: 'none', stroke: '#155e75', 'stroke-width': 2.6, 'stroke-linejoin': 'round' }, gCar);
+  const sprFront = V.el('polyline', { fill: 'none', stroke: '#155e75', 'stroke-width': 2.6, 'stroke-linejoin': 'round' }, gCar);
+  // кузов: рама + крыша + двери (локальные координаты, ЦТ в (0,0), x вправо, y вниз)
+  const body = V.el('g', {}, gCar);
+  const bl = -(P.a + 0.7) * S, br = (P.b + 0.9) * S; // капот длиннее
+  V.el('path', {
+    d: `M${bl},8 L${bl},-14 Q${bl},-22 ${bl + 12},-23 L${-0.9 * S},-26 Q${-0.5 * S},-58 ${0.1 * S},-58
+        L${1.35 * S},-58 Q${1.8 * S},-56 ${2.1 * S},-30 L${br - 30},-24 Q${br},-20 ${br},-6 L${br},8
+        Q${br},14 ${br - 8},14 L${bl + 8},14 Q${bl},14 ${bl},8 Z`,
+    fill: '#155e75', stroke: '#0e3f4f', 'stroke-width': 2,
+  }, body);
+  // окна
+  V.el('path', { d: `M${-0.78 * S},-27 Q${-0.45 * S},-52 ${0.05 * S},-52 L${0.55 * S},-52 L${0.55 * S},-27 Z`, fill: '#cfe3ea' }, body);
+  V.el('path', { d: `M${0.72 * S},-52 L${1.3 * S},-52 Q${1.62 * S},-50 ${1.86 * S},-28 L${0.72 * S},-28 Z`, fill: '#cfe3ea' }, body);
+  // линии дверей и ручки
+  V.el('path', { d: `M${0.63 * S},-55 L${0.63 * S},12 M${-0.9 * S},-25 L${-0.9 * S},12 M${1.95 * S},-27 L${1.95 * S},12`, stroke: '#0e3f4f', 'stroke-width': 1.6, fill: 'none' }, body);
+  V.el('rect', { x: 0.3 * S, y: -18, width: 14, height: 4, rx: 2, fill: '#cfe3ea' }, body);
+  V.el('rect', { x: 1.1 * S, y: -18, width: 14, height: 4, rx: 2, fill: '#cfe3ea' }, body);
+  V.el('rect', { x: br - 6, y: -16, width: 6, height: 8, rx: 2, fill: '#f5e6b8' }, body); // фара
+  // арки: вырезы под колёса рисуем поверх рамы цветом фона? — проще: колёса поверх рамы, рама тонкая понизу
+
+  let wheelAngle = 0;
+  function drawScene() {
+    // дорога
+    const ptsL = [], sFrom = st.x - 4.6, sTo = st.x + 13.2;
+    for (let i = 0; i <= 140; i++) {
+      const s = sFrom + (sTo - sFrom) * i / 140;
+      ptsL.push(`${(XREAR + (s - st.x) * S).toFixed(1)},${(YG - roadAt(s) * SV).toFixed(1)}`);
+    }
+    roadLine.setAttribute('points', ptsL.join(' '));
+    roadFill.setAttribute('d', `M${ptsL.join(' L')} L960,360 L0,360 Z`);
+    // колёса
+    const yRoadR = roadAt(st.x), yRoadF = roadAt(st.x + P.L);
+    const xF = XREAR + P.L * S;
+    const ycR = YG - yRoadR * SV - R_WHEEL * S;
+    const ycF = YG - yRoadF * SV - R_WHEEL * S;
+    wRear.g.setAttribute('transform', `translate(${XREAR},${ycR.toFixed(1)})`);
+    wFront.g.setAttribute('transform', `translate(${xF},${ycF.toFixed(1)})`);
+    const deg = (wheelAngle * 180 / Math.PI) % 360;
+    wRear.rot.setAttribute('transform', `rotate(${deg.toFixed(1)})`);
+    wFront.rot.setAttribute('transform', `rotate(${deg.toFixed(1)})`);
+    // кузов: ЦТ на высоте h0 над уровнем дороги + q1 (вверх положительно — рисуем минус)
+    const h0 = 1.15; // м, статическая высота ЦТ
+    const xCG = XREAR + P.a * S;
+    const yCG = YG - h0 * S - st.q1 * SV;
+    const deg2 = -(st.q2 * KV) * 180 / Math.PI; // экранный угол с тем же преувеличением
+    body.setAttribute('transform', `translate(${xCG.toFixed(1)},${yCG.toFixed(1)}) rotate(${deg2.toFixed(2)})`);
+    // пружины подвески: от точек рамы (±b, ±a) к центрам колёс
+    const th = -st.q2 * KV;
+    const pt = (dx) => ({
+      x: xCG + Math.cos(th) * dx * S,
+      y: yCG + Math.sin(th) * dx * S + 14, // низ рамы
+    });
+    const pF = pt(P.b), pR = pt(-P.a);
+    sprFront.setAttribute('points', V.springPts(pF.x, pF.y, xF, ycF, 6, 8));
+    sprRear.setAttribute('points', V.springPts(pR.x, pR.y, XREAR, ycR, 6, 8));
+  }
+
+  /* ---------- график (бегущее окно) ---------- */
+  const graph = document.getElementById('graph');
+  const GW = { x0: 46, y0: 16, w: 598, h: 268, span: 12 };
+  V.el('rect', { x: GW.x0, y: GW.y0, width: GW.w, height: GW.h, fill: '#fff', stroke: '#d8d6cf' }, graph);
+  V.el('line', { x1: GW.x0, y1: GW.y0 + GW.h / 2, x2: GW.x0 + GW.w, y2: GW.y0 + GW.h / 2, stroke: '#b9b9c0' }, graph);
+  V.el('text', { x: GW.x0 + GW.w - 6, y: GW.y0 + GW.h - 8, 'text-anchor': 'end', class: 'lbl-axis' }, graph).textContent = 'последние 12 с';
+  const lblScale = V.el('text', { x: GW.x0 + 8, y: GW.y0 + 16, class: 'lbl-axis' }, graph);
+  const pl1 = V.el('polyline', { fill: 'none', stroke: '#155e75', 'stroke-width': 2 }, graph);
+  const pl2 = V.el('polyline', { fill: 'none', stroke: '#b3382e', 'stroke-width': 2 }, graph);
+  const buf = [];
+  let yRange = 0.3;
+  function drawGraph() {
+    const t0 = st.t - GW.span;
+    while (buf.length && buf[0][0] < t0) buf.shift();
+    let m = 0.05;
+    for (const r of buf) m = Math.max(m, Math.abs(r[1]), Math.abs(r[2]));
+    yRange = yRange * 0.98 + (m * 1.2) * 0.02;
+    const X = (t) => GW.x0 + (t - t0) / GW.span * GW.w;
+    const Y = (v) => GW.y0 + GW.h / 2 - (v / yRange) * (GW.h / 2) * 0.94;
+    pl1.setAttribute('points', buf.map((r) => `${X(r[0]).toFixed(1)},${Y(r[1]).toFixed(1)}`).join(' '));
+    pl2.setAttribute('points', buf.map((r) => `${X(r[0]).toFixed(1)},${Y(r[2]).toFixed(1)}`).join(' '));
+    lblScale.textContent = `шкала: ±${V.fmt(yRange, 2)}`;
+  }
+
+  /* ---------- шкала резонанса ---------- */
+  const rez = document.getElementById('rez');
+  let fsc = null;
+  function buildRez() {
+    rez.innerHTML = '';
+    V.el('text', { x: 210, y: 30, 'text-anchor': 'middle', class: 'lbl', 'font-size': 15 }, rez)
+      .textContent = 'Частота наезда против собственных';
+    fsc = V.freqScale(rez, {
+      x0: 40, y0: 120, w: 340, fmax: 25,
+      marks: [
+        { f: omega0(), label: `√(2c/m)=${V.fmt(omega0(), 1)}`, color: '#b3382e' },
+        { f: omegaPitch(), label: '', color: '#e2a13b' },
+      ],
+    });
+    updateRez();
+  }
+  const omega0 = () => Math.sqrt(2 * P.c / P.m);
+  const omegaPitch = () => Math.sqrt(P.c * (P.a ** 2 + P.b ** 2) / (P.m * P.rho ** 2));
+  const omegaRoad = () => 2 * Math.PI * P.v / P.lam;
+  function updateRez() {
+    if (!fsc) return;
+    fsc.set(omegaRoad(), `ω = 2πv/λ = ${V.fmt(omegaRoad(), 2)} рад/с`);
+    fsc.moveMark(0, omega0(), `√(2c/m)=${V.fmt(omega0(), 1)}`);
+    fsc.moveMark(1, omegaPitch(), '');
+    const vres = omega0() * P.lam / (2 * Math.PI);
+    document.getElementById('rezCap').innerHTML =
+      `Резонансная скорость при λ = ${V.fmt(P.lam, 1)} м: v* = √(2c/m)·λ/2π = <b>${V.fmt(vres, 1)} м/с</b>
+       (${V.fmt(vres * 3.6, 0)} км/ч). Жёлтая метка — килевая частота √(c(a²+b²)/mρ²) = ${V.fmt(omegaPitch(), 1)} рад/с.`;
+    const near = Math.abs(omegaRoad() - omega0()) < 1.2 || Math.abs(omegaRoad() - omegaPitch()) < 1.2;
+    const b = document.getElementById('wBadge');
+    b.textContent = near && P.road === 'sin' ? 'резонанс близко!' : `ω дороги = ${V.fmt(omegaRoad(), 2)} рад/с`;
+    b.className = 'badge ' + (near && P.road === 'sin' ? 'bad' : 'ok');
+  }
+
+  /* ---------- шаги ---------- */
+  const f = V.fmt;
+  function steps() {
+    document.getElementById('steps').innerHTML = `
+    <div class="step"><span class="f">Уравнения движения (кинематическое возмущение от дороги):</span><br>
+      <span class="res">m·q̈₁ + c₁(q₁ + b·q₂ − y₁) + c₂(q₁ − a·q₂ − y₂) = 0</span><br>
+      <span class="res">m·ρ²·q̈₂ + c₁·b·(q₁ + b·q₂ − y₁) − c₂·a·(q₁ − a·q₂ − y₂) = 0</span>
+      <span class="cmnt">y₁ = road(L + x(t)), y₂ = road(x(t)), x(t) = v·t — след колёс</span></div>
+    <div class="step"><span class="f">Радиус инерции: ρ = √(ab)</span>
+      <span class="sub">= √(${f(P.a, 1)}·${f(P.b, 1)})</span>
+      <span class="res">= ${f(P.rho, 2)} м</span></div>
+    <div class="step"><span class="f">Частота наезда на волны: ω = 2πv/λ</span>
+      <span class="sub">= 2π·${f(P.v, 1)}/${f(P.lam, 1)}</span>
+      <span class="res">= ${f(omegaRoad(), 5)} рад/с</span></div>
+    <div class="step"><span class="f">Собственные частоты: вертикальная √(2c/m), килевая √(c(a²+b²)/(mρ²))</span>
+      <span class="sub">= √(2·${f(P.c / 1000, 0)}·10³/1000); √(${f(P.c / 1000, 0)}·10³·${f(P.a ** 2 + P.b ** 2, 1)}/(1000·${f(P.rho ** 2, 2)}))</span>
+      <span class="res">= ${f(omega0(), 4)} и ${f(omegaPitch(), 4)} рад/с</span></div>
+    <div class="step"><span class="f">Интегрирование: Рунге–Кутта 4-го порядка</span>
+      <span class="res">шаг ${f(DT, 3)} с</span>
+      <span class="cmnt">(в реальном времени анимации; случайная дорога — бугры с шагом U(L/5, L/2) и высотой U(−0,1, 0,1), сглаженные сплайном)</span></div>`;
+  }
+
+  /* ---------- контролы ---------- */
+  V.slider('sV', (v) => { P.v = v; updateRez(); steps(); });
+  V.slider('sC', (v) => { P.c = v * 1000; updateRez(); steps(); });
+  V.slider('sA', (v) => { P.A = v; updateRez(); steps(); });
+  V.slider('sLam', (v) => { P.lam = v; updateRez(); steps(); });
+  const bSin = document.getElementById('bSin'), bRnd = document.getElementById('bRnd');
+  bSin.onclick = () => { P.road = 'sin'; bSin.classList.add('on'); bRnd.classList.remove('on'); updateRez(); };
+  bRnd.onclick = () => { P.road = 'rnd'; bRnd.classList.add('on'); bSin.classList.remove('on'); updateRez(); };
+  document.getElementById('bReseed').onclick = () => {
+    seed = (seed * 1103515245 + 12345) >>> 0;
+    buildRandomRoad();
+    if (P.road !== 'rnd') bRnd.onclick();
+  };
+
+  /* ---------- главный цикл ---------- */
+  V.loop((dt) => {
+    st.acc += dt;
+    const n = Math.min(50, Math.floor(st.acc / DT));
+    st.acc -= n * DT;
+    for (let i = 0; i < n; i++) rk4step(DT);
+    wheelAngle += (P.v / R_WHEEL) * dt; // качение: v/(πd) об/с
+    buf.push([st.t, st.q1, st.q2]);
+    if (buf.length > 3600) buf.shift();
+    drawScene();
+    drawGraph();
+  });
+
+  buildRez();
+  steps();
+  drawScene();
+
+  /* ---------- самопроверка ---------- */
+  {
+    // 1) эталон Mathcad: ω = 2πv/λ при v=10, λ=15
+    const w = 2 * Math.PI * 10 / 15;
+    // 2) проверка РК4: ровная дорога, q1(0)=0,1 — через период T=2π/√(2c/m) должно вернуться
+    const keep = { ...st }, keepP = { A: P.A, road: P.road };
+    P.A = 0; P.road = 'sin';
+    Object.assign(st, { x: 0, q1: 0.1, q2: 0, v1: 0, v2: 0, t: 0, acc: 0 });
+    const T = 2 * Math.PI / Math.sqrt(2 * P.c / P.m);
+    const steps4 = Math.round(T / DT);
+    const dtEx = T / steps4;
+    for (let i = 0; i < steps4; i++) rk4step(dtEx);
+    const q1T = st.q1;
+    Object.assign(st, keep); P.A = keepP.A; P.road = keepP.road;
+    V.selfcheck('m5', [
+      ['ω=2πv/λ', w, 4.18879, 1e-5],
+      ['ρ=√(ab)', P.rho, 2.5, 1e-12],
+      ['√(2c/m)', Math.sqrt(2 * P.c / P.m), 14.142136, 1e-5],
+      ['РК4: q1(T) после периода', q1T, 0.1, 1e-6],
+    ]);
+  }
+})();
+</script>
+</body>
+</html>

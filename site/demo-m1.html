@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>М1. Свободные затухающие колебания массы на пружине</title>
+<meta name="description" content="Живая модель: груз на пружине с вязким сопротивлением. Ползунки M, C, μ, q0, v0, огибающая A·e^(−μt), апериодический режим, решение по шагам.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<main class="wrap">
+  <h1>М1. Свободные затухающие колебания</h1>
+  <p class="lead">Груз массой <i>M</i> висит на пружине жёсткостью <i>C</i>; движению мешает
+  вязкое сопротивление (коэффициент затухания <i>μ</i>). Оттянем груз на <i>q</i>₀ и толкнём со
+  скоростью <i>v</i>₀ — дальше система живёт сама:
+  <span class="eq">q̈ + 2μq̇ + λ²q = 0</span>, где <span class="eq">λ = √(C/M)</span> —
+  собственная частота. Всё на этой странице пересчитывается ползунками на лету.</p>
+  <p><a class="theory-link" href="theory#t2">Свободные колебания</a>
+     <a class="theory-link" href="theory#t3">Затухание и декремент</a></p>
+
+  <div class="panel">
+    <div class="boards">
+      <div style="flex:0 1 300px"><svg id="mech" class="anim" viewBox="0 0 260 430"></svg>
+        <div class="caption">Пружина и груз: смещение <i>q</i> положительно вниз.</div></div>
+      <div style="flex:2 1 460px"><svg id="graph" class="anim" viewBox="0 0 660 430"></svg>
+        <div class="legend"><span><span class="sw" style="background:#155e75"></span><i>q</i>(<i>t</i>)</span>
+          <span><span class="sw" style="background:#9a9aa2;height:2px"></span>огибающая ±<i>A</i>·e<sup>−μt</sup></span></div></div>
+    </div>
+    <div class="controls">
+      <label>M, кг <input type="range" id="sM" min="1" max="50" step="0.5" value="10" data-d="1"> <span class="val" data-for="sM"></span></label>
+      <label>C, Н/м <input type="range" id="sC" min="100" max="5000" step="50" value="1000" data-d="0"> <span class="val" data-for="sC"></span></label>
+      <label>μ, 1/с <input type="range" id="sMu" min="0" max="25" step="0.1" value="1" data-d="1"> <span class="val" data-for="sMu"></span></label>
+      <label>q₀, м <input type="range" id="sQ0" min="-0.3" max="0.3" step="0.01" value="0.1"> <span class="val" data-for="sQ0"></span></label>
+      <label>v₀, м/с <input type="range" id="sV0" min="-3" max="3" step="0.1" value="1" data-d="1"> <span class="val" data-for="sV0"></span></label>
+      <button class="btn" id="bReset">Дефолт (Mathcad)</button>
+      <button class="btn" id="bAper">Апериодика: μ² &gt; λ²</button>
+      <span id="regime" class="badge ok">колебательный режим</span>
+    </div>
+  </div>
+
+  <h2>Решение по шагам</h2>
+  <p class="small">Серым — подстановка текущих значений ползунков, жирным — результат.
+  При значениях по умолчанию (M = 10, C = 1000, μ = 1, q₀ = 0,1, v₀ = 1) числа совпадают
+  с Mathcad-моделью <code>mass_on_spring</code>.</p>
+  <div class="steps" id="steps"></div>
+
+  <div class="note tip" id="noteOsc">
+  <b>Что смотреть.</b> Амплитуда гаснет по экспоненте — соседние размахи относятся как
+  e<sup>μT</sup> (логарифмический декремент δ = μT). Затухание почти не меняет частоту:
+  при μ = 1 и λ = 10 частота падает всего до λ′ = 9,95. Сделайте μ² &gt; λ² — колебания
+  исчезают вовсе: система апериодически сползает к равновесию (кнопка «Апериодика»).
+  </div>
+
+  <p class="verified">Сверено с Mathcad-моделью кафедры (mass_on_spring): λ = 10; λ′ = 9,94987;
+  A = 0,149071; ε = 0,835482.</p>
+</main>
+<script src="assets/site.js" data-root="./" data-page="demo-m1"></script>
+<script src="assets/vibro.js"></script>
+<script>
+'use strict';
+(() => {
+  const P = { M: 10, C: 1000, mu: 1, q0: 0.1, v0: 1 };
+  let sol = null; // текущее аналитическое решение
+  let anim = null;
+
+  /* ---------- механика: пружина + демпфер + груз ---------- */
+  const mech = document.getElementById('mech');
+  const gM = V.el('g', {}, mech);
+  V.el('line', { x1: 30, y1: 20, x2: 230, y2: 20, stroke: '#16161a', 'stroke-width': 2.5 }, gM);
+  V.el('path', { d: V.hatch(30, 20, 230, 20, 12, 10, -Math.PI * 0.75), stroke: '#9a9aa2', 'stroke-width': 1.3, fill: 'none' }, gM);
+  const spring = V.el('polyline', { fill: 'none', stroke: '#155e75', 'stroke-width': 2.4, 'stroke-linejoin': 'round' }, gM);
+  // демпфер: цилиндр на потолке + шток к грузу
+  V.el('path', { d: 'M158,20 L158,60', stroke: '#16161a', 'stroke-width': 2 }, gM);
+  V.el('path', { d: 'M146,60 L146,150 M170,60 L170,150 M146,60 L170,60', stroke: '#16161a', 'stroke-width': 2, fill: 'none' }, gM);
+  const rod = V.el('line', { stroke: '#16161a', 'stroke-width': 2 }, gM);
+  const piston = V.el('line', { stroke: '#16161a', 'stroke-width': 4 }, gM);
+  const mass = V.el('g', {}, gM);
+  V.el('rect', { x: 60, y: -23, width: 140, height: 46, rx: 5, fill: '#eceae3', stroke: '#16161a', 'stroke-width': 2 }, mass);
+  const mLbl = V.el('text', { x: 130, y: 6, 'text-anchor': 'middle', class: 'lbl' }, mass);
+  // ось q
+  V.el('line', { x1: 34, y1: 250, x2: 34, y2: 320, stroke: '#6b6b74', 'stroke-width': 1.4, 'marker-end': 'url(#arrE)' }, gM);
+  V.el('text', { x: 40, y: 316, class: 'lbl-axis' }, gM).textContent = 'q';
+  V.el('line', { x1: 24, y1: 250, x2: 60, y2: 250, stroke: '#9a9aa2', 'stroke-dasharray': '4 4' }, gM);
+
+  const Y0 = 250, SCALE = 450; // px на метр
+  function drawMech(q) {
+    const qc = Math.max(-0.28, Math.min(0.28, q));
+    const yc = Y0 + qc * SCALE;
+    mass.setAttribute('transform', `translate(0,${yc.toFixed(1)})`);
+    spring.setAttribute('points', V.springPts(100, 20, 100, yc - 23, 20, 13));
+    rod.setAttribute('x1', 158); rod.setAttribute('x2', 158);
+    rod.setAttribute('y1', yc - 23); rod.setAttribute('y2', yc - 23 - 130);
+    const yp = Math.max(64, Math.min(146, yc - 153));
+    piston.setAttribute('x1', 148); piston.setAttribute('x2', 168);
+    piston.setAttribute('y1', yp); piston.setAttribute('y2', yp);
+  }
+
+  /* ---------- график ---------- */
+  const graph = document.getElementById('graph');
+  let plot = null, envU = null, envD = null;
+
+  /* ---------- аналитика ---------- */
+  function solve() {
+    const { M, C, mu, q0, v0 } = P;
+    const lam = Math.sqrt(C / M);
+    const s = { lam, mu, q0, v0, type: '' };
+    if (mu < lam - 1e-9) {
+      s.type = 'osc';
+      s.lam1 = Math.sqrt(lam * lam - mu * mu);
+      s.A = Math.sqrt(q0 * q0 + ((v0 + mu * q0) / s.lam1) ** 2);
+      s.eps = s.A < 1e-12 ? 0 : Math.atan2((v0 + mu * q0) / s.lam1, q0);
+      s.T = 2 * Math.PI / s.lam1;
+      s.q = (t) => s.A * Math.exp(-mu * t) * Math.cos(s.lam1 * t - s.eps);
+    } else if (mu > lam + 1e-9) {
+      s.type = 'aper';
+      s.beta = Math.sqrt(mu * mu - lam * lam);
+      s.C1 = (v0 + (mu + s.beta) * q0) / (2 * s.beta);
+      s.C2 = q0 - s.C1;
+      s.q = (t) => s.C1 * Math.exp((-mu + s.beta) * t) + s.C2 * Math.exp((-mu - s.beta) * t);
+    } else {
+      s.type = 'crit';
+      s.q = (t) => (q0 + (v0 + mu * q0) * t) * Math.exp(-mu * t);
+    }
+    return s;
+  }
+
+  function rebuild() {
+    sol = solve();
+    // диапазон графика
+    let ymax = 0.05;
+    for (let t = 0; t <= 6; t += 0.01) ymax = Math.max(ymax, Math.abs(sol.q(t)));
+    ymax *= 1.15;
+    const t1 = sol.type === 'osc' ? Math.max(4, Math.min(12, 8 * sol.T)) : 6;
+    graph.innerHTML = '';
+    plot = V.plot(graph, {
+      x0: 46, y0: 18, w: 596, h: 380, t1, ymin: -ymax, ymax,
+      series: [{ color: '#155e75', w: 2.2 }], ylab: 'q, м',
+    });
+    envU = envD = null;
+    if (sol.type === 'osc' && sol.mu > 0) {
+      const e = (t) => sol.A * Math.exp(-sol.mu * t);
+      envU = plot.curve(e, { stroke: '#9a9aa2', 'stroke-width': 1.4, 'stroke-dasharray': '5 4' });
+      envD = plot.curve((t) => -e(t), { stroke: '#9a9aa2', 'stroke-width': 1.4, 'stroke-dasharray': '5 4' });
+    }
+    const badge = document.getElementById('regime');
+    badge.textContent = sol.type === 'osc' ? 'колебательный режим (μ² < λ²)'
+      : sol.type === 'aper' ? 'апериодический режим (μ² > λ²)' : 'критическое затухание (μ = λ)';
+    badge.className = 'badge ' + (sol.type === 'osc' ? 'ok' : 'bad');
+    mLbl.textContent = `M = ${V.fmt(P.M, 1)} кг`;
+    steps();
+    if (anim) anim.reset();
+  }
+
+  /* ---------- шаги ---------- */
+  const f = V.fmt;
+  function steps() {
+    const s = sol, box = document.getElementById('steps');
+    let h = `
+    <div class="step"><span class="f">Собственная частота: λ = √(C/M)</span>
+      <span class="sub">= √(${f(P.C, 0)}/${f(P.M, 1)})</span>
+      <span class="res">= ${f(s.lam, 5)} рад/с</span>
+      <span class="cmnt">(период без затухания T₀ = 2π/λ = ${f(2 * Math.PI / s.lam, 4)} с)</span></div>`;
+    if (s.type === 'osc') {
+      h += `
+    <div class="step"><span class="f">Частота с затуханием: λ′ = √(λ² − μ²)</span>
+      <span class="sub">= √(${f(s.lam ** 2, 2)} − ${f(P.mu ** 2, 2)})</span>
+      <span class="res">= ${f(s.lam1, 5)} рад/с</span>
+      <span class="cmnt">T = 2π/λ′ = ${f(s.T, 4)} с, декремент δ = μT = ${f(P.mu * s.T, 4)}</span></div>
+    <div class="step"><span class="f">Амплитуда: A = √(q₀² + ((v₀ + μq₀)/λ′)²)</span>
+      <span class="sub">= √(${f(P.q0 ** 2, 4)} + ((${f(P.v0, 2)} + ${f(P.mu, 1)}·${f(P.q0, 2)})/${f(s.lam1, 4)})²)</span>
+      <span class="res">= ${f(s.A, 6)} м</span></div>
+    <div class="step"><span class="f">Фаза: ε = arccos(q₀/A)</span>
+      <span class="sub">= arccos(${f(P.q0, 2)}/${f(s.A, 5)})</span>
+      <span class="res">= ${f(s.eps, 6)} рад</span>
+      <span class="cmnt">(знак — по sin ε = (v₀+μq₀)/(λ′A))</span></div>
+    <div class="step"><span class="f">Ответ:</span>
+      <span class="res">q(t) = ${f(s.A, 6)}·e<sup>−${f(P.mu, 1)}t</sup>·cos(${f(s.lam1, 5)}t − ${f(s.eps, 5)})</span></div>`;
+    } else if (s.type === 'aper') {
+      h += `
+    <div class="step"><span class="f">μ² > λ² → корни вещественные: s₁,₂ = −μ ± β, β = √(μ² − λ²)</span>
+      <span class="sub">= √(${f(P.mu ** 2, 2)} − ${f(s.lam ** 2, 2)})</span>
+      <span class="res">β = ${f(s.beta, 5)} 1/с</span></div>
+    <div class="step"><span class="f">C₁ = (v₀ + (μ+β)q₀)/(2β), C₂ = q₀ − C₁</span>
+      <span class="res">C₁ = ${f(s.C1, 5)}, C₂ = ${f(s.C2, 5)}</span></div>
+    <div class="step"><span class="f">Ответ (без колебаний!):</span>
+      <span class="res">q(t) = ${f(s.C1, 4)}·e<sup>${f(-P.mu + s.beta, 3)}t</sup> + ${f(s.C2, 4)}·e<sup>${f(-P.mu - s.beta, 3)}t</sup></span></div>`;
+    } else {
+      h += `<div class="step"><span class="f">μ = λ (критическое затухание):</span>
+      <span class="res">q(t) = (q₀ + (v₀+μq₀)t)·e<sup>−μt</sup></span></div>`;
+    }
+    box.innerHTML = h;
+  }
+
+  /* ---------- контролы ---------- */
+  const sl = {
+    M: V.slider('sM', (v) => { P.M = v; rebuild(); }),
+    C: V.slider('sC', (v) => { P.C = v; rebuild(); }),
+    mu: V.slider('sMu', (v) => { P.mu = v; rebuild(); }),
+    q0: V.slider('sQ0', (v) => { P.q0 = v; rebuild(); }),
+    v0: V.slider('sV0', (v) => { P.v0 = v; rebuild(); }),
+  };
+  document.getElementById('bReset').onclick = () => {
+    sl.M.set(10); sl.C.set(1000); sl.mu.set(1); sl.q0.set(0.1); sl.v0.set(1);
+  };
+  document.getElementById('bAper').onclick = () => { sl.mu.set(15); };
+
+  /* ---------- анимация ---------- */
+  anim = V.loop(() => {
+    if (!sol || !plot) return;
+    const tCur = anim.t % (plot.t1 + 0.8);
+    const tq = Math.min(tCur, plot.t1);
+    drawMech(sol.q(tq));
+    plot.draw([sol.q], tCur);
+  });
+
+  rebuild();
+
+  /* ---------- самопроверка с эталонами Mathcad ---------- */
+  {
+    const s = sol; // дефолтные параметры
+    V.selfcheck('m1', [
+      ['λ', s.lam, 10, 1e-9],
+      ['λ′', s.lam1, 9.94987, 1e-5],
+      ['A', s.A, 0.149071, 1e-6],
+      ['ε', s.eps, 0.835482, 1e-6],
+    ]);
+  }
+})();
+</script>
+</body>
+</html>

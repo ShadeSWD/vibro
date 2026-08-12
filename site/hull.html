@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Общая вибрация корпуса судна</title>
+<meta name="description" content="Корпус как свободная балка переменного сечения: формы с двумя и тремя узлами, присоединённые массы воды по Локвуду–Тейлору, метод Релея, резонансная проверка по лопастной частоте. Живая модель.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<main class="wrap">
+  <h1>Общая вибрация корпуса судна</h1>
+  <p class="lead">Корпус на волне и под винтом изгибается целиком — как <b>свободная балка
+  переменного сечения</b>, плавающая в воде. Ниже — живая модель форм колебаний корпуса и
+  резонансная проверка: крутите обороты вала и число лопастей и следите, не попала ли
+  лопастная частота на собственную.</p>
+  <p><a class="theory-link" href="theory#t12">Метод Релея</a>
+     <a class="theory-link" href="theory#t13">Тема 13 конспекта</a></p>
+
+  <h2>Виды общей вибрации</h2>
+  <p>Различают <b>вертикальную</b> (изгиб в диаметральной плоскости — самая важная,
+  её и рассматриваем), <b>горизонтальную</b> (изгиб в плоскости палуб) и <b>крутильную</b>
+  (закручивание вокруг продольной оси; опасна для контейнеровозов с открытыми трюмами).
+  Главный возмутитель — гребной винт с лопастной частотой
+  <span class="eq">ν<sub>л</sub> = N·n/60</span> Гц (N — обороты в минуту, n — число лопастей),
+  а также неуравновешенность механизмов и волнение.</p>
+
+  <div class="panel">
+    <svg id="ship" class="anim" viewBox="0 0 920 330"></svg>
+    <div class="controls">
+      <button class="btn on" id="bT2">2-узловая</button>
+      <button class="btn" id="bT3">3-узловая</button>
+      <button class="btn" id="bT4">4-узловая</button>
+      <span class="badge ok" id="toneBadge"></span>
+    </div>
+    <div class="controls">
+      <label>N, об/мин <input type="range" id="sN" min="30" max="300" step="5" value="120" data-d="0"> <span class="val" data-for="sN"></span></label>
+      <label>лопастей n <input type="range" id="sBl" min="3" max="6" step="1" value="4" data-d="0"> <span class="val" data-for="sBl"></span></label>
+      <span class="badge ok" id="resBadge"></span>
+    </div>
+    <div class="caption">Формы колебаний свободной балки (прогибы преувеличены, движение
+    замедлено втрое). Красные точки — узлы: судно «дышит» вокруг них. Внизу — шкала частот:
+    стрелка — лопастная частота, красные метки — собственные частоты корпуса-примера.</div>
+  </div>
+
+  <h2>Корпус — свободная балка</h2>
+  <p>Концы корпуса свободны: изгибающий момент и перерезывающая сила на носу и корме равны
+  нулю. Частотное уравнение свободной балки постоянного сечения
+  <span class="eq">cos μ·ch μ = 1</span> даёт корни μ₁ = 4,730, μ₂ = 7,853, μ₃ = 10,996 —
+  формы с 2, 3, 4 узлами (форм без узлов у свободной балки нет: первые два «тона» —
+  перемещение и поворот как жёсткого тела, их частота нулевая). Но сечение корпуса сильно
+  переменно, поэтому точные балочные формулы не работают — частоты считают приближённо,
+  методом Релея.</p>
+
+  <h2>Присоединённая вода</h2>
+  <p>Колеблясь, корпус увлекает воду: к массе судна добавляется <b>присоединённая масса</b>.
+  Её погонное значение оценивают по Локвуду–Тейлору:</p>
+  <div class="formula key">r<sub>н</sub>(x) = ½·γ·k<sub>н</sub>·F(x)·b(x)/T,</div>
+  <p>где γ — плотность воды, F(x) — площадь погружённой части шпангоута, b(x) — ширина по
+  ватерлинии, T — осадка, k<sub>н</sub> — коэффициент формы шпангоута. Присоединённая вода
+  сопоставима с массой судна и заметно понижает частоты; для высших тонов её берут с
+  понижающим коэффициентом.</p>
+
+  <h2>Метод Релея для корпуса</h2>
+  <p>Распределения массы и жёсткости задают <b>гистограммами</b> по теоретическим шпациям:
+  m(x) + r<sub>н</sub>(x) и I(x):</p>
+  <div class="panel" style="max-width:860px">
+    <svg id="hist" class="anim" viewBox="0 0 820 240"></svg>
+    <div class="caption">Типичные гистограммы: масса с пиком в районе машинного отделения и
+    присоединённой водой; момент инерции I(x) максимален в средней части.</div>
+  </div>
+  <p>Форму колебаний задают в виде</p>
+  <div class="formula key">w̃<sub>n</sub>(x) = α<sub>n</sub> + β<sub>n</sub>·(x/L − 0,5) + f<sub>n</sub>(x),</div>
+  <p>где f<sub>n</sub> — «балочная» заготовка формы, а константы α<sub>n</sub>, β<sub>n</sub>
+  подбирают из <b>условий уравновешенности</b> свободной балки — колебания не должны давать
+  ни силы, ни момента:</p>
+  <div class="formula">∫(m + r<sub>н</sub>)·w̃<sub>n</sub>·dx = 0, &nbsp;&nbsp;
+  ∫(m + r<sub>н</sub>)·w̃<sub>n</sub>·x·dx = 0.</div>
+  <p>Тогда частота — из отношения энергий (суммы по шпациям):</p>
+  <div class="formula key">λ<sub>n</sub>² = Σ EI·(w̃<sub>n</sub>″)²·Δx / Σ (m + r<sub>н</sub>)·w̃<sub>n</sub>²·Δx.</div>
+  <p>Корпус — короткая высокая балка, поэтому обязательно вводят <b>поправку на сдвиг</b>
+  (и инерцию поворота сечений): податливости складываются,
+  1/λ² ≈ 1/λ²<sub>изг</sub> + 1/λ²<sub>сдв</sub>, и частота ощутимо падает — для 2-узловой
+  формы на проценты, для высших тонов на десятки процентов.</p>
+
+  <h2>Резонансная проверка</h2>
+  <p>Найденные λ₁, λ₂, … сравнивают с лопастной частотой ν<sub>л</sub> = N·n/60 во всём
+  диапазоне оборотов: попадание в ±10–15 % — повод менять число лопастей, обороты или
+  жёсткость корпуса. Именно это делает шкала под живой моделью выше: подведите стрелку к
+  красной метке — модель подсветит «резонанс» и сама переключится на резонирующую форму.</p>
+
+  <p class="verified">Формы — точные решения свободной балки (μ₁ = 4,730; μ₂ = 7,853;
+  μ₃ = 10,996); частоты корпуса-примера (L = 100 м): λ₁ = 1,3; λ₂ = 2,9; λ₃ = 4,8 Гц —
+  типичные величины для сухогруза средних размеров.</p>
+</main>
+<script src="assets/site.js" data-root="./" data-page="hull"></script>
+<script src="assets/vibro.js"></script>
+<script>
+'use strict';
+(() => {
+  /* формы свободной балки */
+  const MUS = [4.73004074, 7.85320462, 10.9956078];
+  const LAMS = [1.3, 2.9, 4.8]; // Гц, судно-пример
+  function modeFn(i) {
+    const mu = MUS[i];
+    const s = (Math.cosh(mu) - Math.cos(mu)) / (Math.sinh(mu) - Math.sin(mu));
+    return (xi) => {
+      const k = mu * xi;
+      return Math.cosh(k) + Math.cos(k) - s * (Math.sinh(k) + Math.sin(k));
+    };
+  }
+  const modes = [0, 1, 2].map((i) => {
+    const f = modeFn(i);
+    let mx = 0;
+    for (let j = 0; j <= 200; j++) mx = Math.max(mx, Math.abs(f(j / 200)));
+    // узлы
+    const nodes = [];
+    let prev = f(0.001);
+    for (let j = 1; j <= 500; j++) {
+      const xi = 0.001 + 0.998 * j / 500, v = f(xi);
+      if (prev * v < 0) {
+        let a = xi - 0.998 / 500, b = xi;
+        for (let it = 0; it < 40; it++) { const m = (a + b) / 2; if (f(a) * f(m) <= 0) b = m; else a = m; }
+        nodes.push((a + b) / 2);
+      }
+      prev = v;
+    }
+    return { f, norm: mx, nodes };
+  });
+
+  let tone = 0;
+
+  /* ---------- сцена: силуэт судна ---------- */
+  const svg = document.getElementById('ship');
+  const X0 = 90, XW = 740, WL = 178; // ватерлиния
+  V.el('rect', { x: 0, y: 0, width: 920, height: 330, fill: '#eef4f6' }, svg);
+  const water = V.el('rect', { x: 0, y: WL, width: 920, height: 60, fill: '#155e75', opacity: 0.15 }, svg);
+  const gShip = V.el('g', {}, svg);
+  const hullPoly = V.el('polygon', { fill: '#e7eef1', stroke: '#16161a', 'stroke-width': 2.2 }, gShip);
+  const deckLine = V.el('polyline', { fill: 'none', stroke: '#16161a', 'stroke-width': 1.2 }, gShip);
+  const sup = V.el('polygon', { fill: '#eceae3', stroke: '#16161a', 'stroke-width': 1.8 }, gShip);
+  const funnel = V.el('polygon', { fill: '#b3382e', stroke: '#16161a', 'stroke-width': 1.6 }, gShip);
+  const axis = V.el('polyline', { fill: 'none', stroke: '#b3382e', 'stroke-width': 1.6, 'stroke-dasharray': '6 5' }, gShip);
+  const gNodes = V.el('g', {}, svg);
+  V.el('text', { x: 20, y: WL - 6, class: 'lbl-axis' }, svg).textContent = 'ВЛ';
+
+  /* базовый контур: точки (xi 0..1 от кормы, y) — палуба слева направо, потом днище обратно */
+  // корма (xi=0) слева, нос (xi=1) справа
+  const deckY = (xi) => 140 - 14 * ((xi - 0.45) ** 2) * 4 * (xi > 0.45 ? 1.6 : 0.7); // седловатость
+  const outline = [];
+  outline.push([0, 148]);                       // транец верх
+  for (let j = 0; j <= 40; j++) { const xi = j / 40; outline.push([xi, deckY(xi)]); }
+  outline.push([1, 150]);                       // форштевень верх
+  outline.push([0.965, 214]);                   // форштевень наклонный к килю
+  for (let j = 36; j >= 2; j--) outline.push([j / 40, 216]); // киль
+  outline.push([0.03, 206], [0, 190]);          // кормовой подзор
+  const supPts = [[0.10, deckY(0.10)], [0.30, deckY(0.30)], [0.30, 96], [0.24, 96], [0.24, 74], [0.12, 74], [0.12, 96], [0.10, 96]];
+  const funPts = [[0.145, 74], [0.185, 74], [0.175, 44], [0.155, 44]];
+
+  const px = (xi) => X0 + xi * XW;
+  function dy(xi, t, amp) {
+    const m = modes[tone];
+    return (m.f(xi) / m.norm) * amp * Math.sin(2 * Math.PI * LAMS[tone] * 0.3 * t) * -1;
+  }
+  function place(pts, t, amp) {
+    return pts.map(([xi, y]) => `${px(xi).toFixed(1)},${(y + dy(xi, t, amp)).toFixed(1)}`).join(' ');
+  }
+
+  function drawNodes() {
+    gNodes.innerHTML = '';
+    for (const xi of modes[tone].nodes) {
+      V.el('circle', { cx: px(xi), cy: WL, r: 5, fill: '#b3382e', stroke: '#fff', 'stroke-width': 1.5 }, gNodes);
+      V.el('text', { x: px(xi), y: WL - 12, 'text-anchor': 'middle', class: 'lbl', fill: '#b3382e', 'font-size': 13 }, gNodes)
+        .textContent = 'узел';
+    }
+    document.getElementById('toneBadge').textContent =
+      `${tone + 2}-узловая форма · λ${'₁₂₃'[tone]} = ${V.fmt(LAMS[tone], 1)} Гц`;
+  }
+
+  /* ---------- шкала частот ---------- */
+  let fsc = null;
+  function buildScale() {
+    svg.querySelectorAll('.fscale').forEach((n) => n.remove());
+    const g = V.el('g', { class: 'fscale' }, svg);
+    fsc = V.freqScale(g, {
+      x0: 120, y0: 292, w: 680, fmax: 12,
+      marks: LAMS.map((f, i) => ({ f, label: `λ${'₁₂₃'[i]}=${V.fmt(f, 1)}`, color: '#b3382e' })),
+    });
+  }
+  function updateScale() {
+    if (!fsc) return;
+    const N = P.N, n = P.n;
+    const nuL = N * n / 60;
+    fsc.set(nuL, `νл = ${V.fmt(N, 0)}·${n}/60 = ${V.fmt(nuL, 2)} Гц`);
+    let hit = -1;
+    LAMS.forEach((lam, i) => { if (Math.abs(nuL - lam) / lam < 0.12) hit = i; });
+    const b = document.getElementById('resBadge');
+    if (hit >= 0) {
+      if (tone !== hit) { tone = hit; syncBtns(); drawNodes(); }
+      b.textContent = `резонанс близко: νл ≈ λ${'₁₂₃'[hit]} — раскачивается ${hit + 2}-узловая форма`;
+      b.className = 'badge bad';
+    } else {
+      b.textContent = `νл = ${V.fmt(nuL, 2)} Гц — вне резонансов (±12%)`;
+      b.className = 'badge ok';
+    }
+  }
+
+  const P = { N: 120, n: 4 };
+  V.slider('sN', (v) => { P.N = v; updateScale(); });
+  V.slider('sBl', (v) => { P.n = v; updateScale(); });
+
+  const btns = ['bT2', 'bT3', 'bT4'].map((id) => document.getElementById(id));
+  function syncBtns() { btns.forEach((b, i) => b.classList.toggle('on', i === tone)); }
+  btns.forEach((b, i) => b.addEventListener('click', () => { tone = i; syncBtns(); drawNodes(); }));
+
+  V.loop((dt, t) => {
+    const amp = 20;
+    hullPoly.setAttribute('points', place(outline, t, amp));
+    sup.setAttribute('points', place(supPts, t, amp));
+    funnel.setAttribute('points', place(funPts, t, amp));
+    const dpts = [];
+    for (let j = 0; j <= 40; j++) { const xi = j / 40; dpts.push(`${px(xi).toFixed(1)},${(deckY(xi) + 10 + dy(xi, t, amp)).toFixed(1)}`); }
+    deckLine.setAttribute('points', dpts.join(' '));
+    const apts = [];
+    for (let j = 0; j <= 60; j++) { const xi = j / 60; apts.push(`${px(xi).toFixed(1)},${(WL + 8 + dy(xi, t, amp)).toFixed(1)}`); }
+    axis.setAttribute('points', apts.join(' '));
+    void water;
+  });
+
+  buildScale();
+  updateScale();
+  drawNodes();
+
+  /* ---------- гистограммы m(x), I(x) ---------- */
+  {
+    const h = document.getElementById('hist');
+    const mBars = [0.55, 0.9, 1.15, 0.95, 0.85, 0.8, 0.8, 0.85, 0.9, 0.75, 0.45]; // машина в корме (слева)
+    const rBars = [0.25, 0.5, 0.62, 0.68, 0.7, 0.7, 0.7, 0.68, 0.6, 0.42, 0.18];  // присоед. вода
+    const iBars = [0.25, 0.5, 0.75, 0.92, 1.0, 1.0, 1.0, 0.92, 0.72, 0.45, 0.2];
+    const draw = (x0, bars, extra, color, color2, title, ylab) => {
+      const w = 340, hh = 150, y0 = 40, bw = w / bars.length;
+      V.el('text', { x: x0 + w / 2, y: 24, 'text-anchor': 'middle', class: 'lbl', 'font-size': 14.5 }, h).textContent = title;
+      bars.forEach((v, i) => {
+        V.el('rect', { x: x0 + i * bw + 1, y: y0 + hh - v * hh, width: bw - 2, height: v * hh, fill: color, stroke: '#fff', 'stroke-width': 1 }, h);
+        if (extra) V.el('rect', { x: x0 + i * bw + 1, y: y0 + hh - (v + extra[i]) * hh * 0.72, width: bw - 2, height: extra[i] * hh * 0.72, fill: color2, opacity: 0.75, stroke: '#fff', 'stroke-width': 1 }, h);
+      });
+      V.el('line', { x1: x0, y1: y0 + hh, x2: x0 + w, y2: y0 + hh, stroke: '#16161a', 'stroke-width': 1.6 }, h);
+      V.el('text', { x: x0, y: y0 + hh + 18, class: 'lbl-axis' }, h).textContent = 'корма';
+      V.el('text', { x: x0 + w, y: y0 + hh + 18, 'text-anchor': 'end', class: 'lbl-axis' }, h).textContent = 'нос';
+      V.el('text', { x: x0 + 4, y: y0 - 4, class: 'lbl-axis' }, h).textContent = ylab;
+    };
+    draw(40, mBars, rBars, '#155e75', '#9fc2cf', 'Масса: m(x) + присоединённая вода rₙ(x)', 'т/м');
+    draw(440, iBars, null, '#1a7f37', null, 'Момент инерции сечения I(x)', 'м⁴');
+  }
+})();
+</script>
+</body>
+</html>

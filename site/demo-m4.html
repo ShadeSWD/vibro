@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>М4. Консольная балка на вибростенде</title>
+<meta name="description" content="Живая модель: пластиковая линейка в вибрирующей заделке. Решение уравнения изгибных колебаний, узлы формы, резонансы консоли, ползунок частоты 1–30 Гц.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<main class="wrap">
+  <h1>М4. Линейка на вибростенде</h1>
+  <p class="lead">Классический лабораторный опыт: пластиковую линейку (E = 2 ГПа, ρ = 2350 кг/м³,
+  сечение 25×1 мм, вылет L = 260 мм) зажимают в головке вибростенда, которая ходит вверх-вниз
+  с амплитудой <i>f</i> = 10 мм и частотой ν. Балка отвечает формой
+  <span class="eq">w(x,t) = w₁(x)·sin ωt</span>, где w₁(x) — решение уравнения
+  <span class="eq">EI·w′′′′ = mω²·w</span> с условиями заделки и свободного конца.
+  Крутите частоту через резонанс — форма перестраивается, появляется <b>узел</b>.</p>
+  <p><a class="theory-link" href="theory#t7">Колебания балок</a>
+     <a class="theory-link" href="theory#t9">Вынужденные колебания балок</a></p>
+
+  <div class="panel">
+    <svg id="mech" class="anim" viewBox="0 0 900 430"></svg>
+    <div class="legend">
+      <span><span class="sw" style="background:#155e75"></span>линейка w(x,t)</span>
+      <span><span class="sw" style="background:#9a9aa2;height:2px"></span>огибающая ±w₁(x)</span>
+      <span><span class="sw" style="background:#b3382e;height:8px;width:8px;border-radius:50%"></span>узел формы (точка не движется)</span>
+    </div>
+    <div class="controls">
+      <label>ν, Гц <input type="range" id="sNu" min="1" max="30" step="0.1" value="15" data-d="1"> <span class="val" data-for="sNu"></span></label>
+      <label>f, мм <input type="range" id="sF" min="2" max="15" step="0.5" value="10" data-d="1"> <span class="val" data-for="sF"></span></label>
+      <label>L, мм <input type="range" id="sL" min="150" max="350" step="5" value="260" data-d="0"> <span class="val" data-for="sL"></span></label>
+      <label>h, мм <input type="range" id="sH" min="0.5" max="2" step="0.1" value="1" data-d="1"> <span class="val" data-for="sH"></span></label>
+      <button class="btn" id="bDef">Дефолт (Mathcad)</button>
+      <span class="badge ok" id="resBadge"></span>
+    </div>
+  </div>
+
+  <h2>Решение по шагам</h2>
+  <p class="small">Серым — подстановка текущих значений, жирным — результат. При дефолте
+  (ν = 15 Гц) константы совпадают с Mathcad-моделью <code>console_beam</code>.</p>
+  <div class="steps" id="steps"></div>
+
+  <div class="note tip"><b>Что смотреть.</b> Ниже первого резонанса (ν &lt; λ₁ = 2,2 Гц) линейка
+  ходит почти как жёсткая. Между λ₁ и λ₂ конец машет сильнее заделки. При переходе через
+  λ₂ = 13,8 Гц форма «переламывается»: возникает узел — точка, которая стоит на месте, хотя
+  заделка и конец колеблются. На шкале частот резонансы отмечены красным; попадёте в них —
+  амплитуда (в модели без трения) неограниченно растёт.</div>
+
+  <p class="verified">Сверено с Mathcad-моделью кафедры (console_beam), ν = 15 Гц: μ = 4,891180;
+  A = 0,00409696; B = −0,00598006; C = 0,00401994; D = −0,00409696; λ₁ = 2,207 Гц; λ₂ = 13,819 Гц.</p>
+</main>
+<script src="assets/site.js" data-root="./" data-page="demo-m4"></script>
+<script src="assets/vibro.js"></script>
+<script>
+'use strict';
+(() => {
+  const E = 2e9, rho = 2350, bw = 0.025;
+  const P = { nu: 15, f: 0.01, L: 0.26, h: 0.001 };
+  let sol = null;
+
+  function solve() {
+    const { nu, f, L, h } = P;
+    const I = bw * h ** 3 / 12;
+    const m = rho * bw * h;
+    const EI = E * I;
+    const cst = Math.sqrt(EI / m) / (2 * Math.PI * L * L);
+    const lam1 = 3.52 * cst, lam2 = 22.04 * cst; // Гц
+    const w = 2 * Math.PI * nu;
+    const mu = L * Math.pow(w * w * m / EI, 0.25);
+    const s = Math.sin(mu), c = Math.cos(mu), sh = Math.sinh(mu), ch = Math.cosh(mu);
+    // Система 4×4 в точности как в кафедральном console_beam.xmcd (блок Given/Find):
+    // w(0)=f, w'(0)=0, w''(L)=0, w'''(L)=0
+    const M = [
+      [0, -1, 1, 0],    // w(0) = f
+      [1, 0, 0, 1],     // w'(0) = 0
+      [-s, -c, ch, sh], // w''(L) = 0
+      [-c, s, sh, ch],  // w'''(L) = 0
+    ];
+    const x = V.solveLin(M, [f, 0, 0, 0]);
+    const [A, B, C, D] = x || [0, 0, 0, 0];
+    const k = mu / L;
+    const w1 = (xx) => A * Math.sin(k * xx) - B * Math.cos(k * xx)
+                     + C * Math.cosh(k * xx) + D * Math.sinh(k * xx);
+    // узлы w1(x)=0 на (0, L]
+    const nodes = [];
+    let prev = w1(0.02 * L);
+    for (let i = 1; i <= 400; i++) {
+      const xx = 0.02 * L + (0.98 * L) * i / 400;
+      const v = w1(xx);
+      if (prev * v < 0) { // бисекция
+        let a = xx - 0.98 * L / 400, b2 = xx;
+        for (let j = 0; j < 40; j++) {
+          const mid = (a + b2) / 2;
+          if (w1(a) * w1(mid) <= 0) b2 = mid; else a = mid;
+        }
+        nodes.push((a + b2) / 2);
+      }
+      prev = v;
+    }
+    let wmax = 0;
+    for (let i = 0; i <= 200; i++) wmax = Math.max(wmax, Math.abs(w1(L * i / 200)));
+    return { I, m, EI, lam1, lam2, w, mu, A, B, C, D, w1, nodes, wmax, sing: !x };
+  }
+
+  /* ---------- сцена ---------- */
+  const mech = document.getElementById('mech');
+  const X0 = 190, Y0 = 200;
+  let PXM = 2300; // px на метр, пересчитывается от L
+  // корпус вибростенда
+  V.el('rect', { x: 40, y: 300, width: 220, height: 90, rx: 8, fill: '#eceae3', stroke: '#16161a', 'stroke-width': 2 }, mech);
+  V.el('path', { d: V.hatch(40, 390, 260, 390, 14, 10, -Math.PI * 0.75), stroke: '#9a9aa2', 'stroke-width': 1.3, fill: 'none' }, mech);
+  V.el('text', { x: 150, y: 350, 'text-anchor': 'middle', class: 'lbl-axis' }, mech).textContent = 'вибростенд';
+  const stem = V.el('rect', { x: 138, y: 0, width: 24, height: 0, fill: '#d6d3ca', stroke: '#16161a', 'stroke-width': 1.6 }, mech);
+  const head = V.el('g', {}, mech); // головка с заделкой
+  V.el('rect', { x: 100, y: -34, width: 100, height: 68, rx: 6, fill: '#155e75', opacity: 0.88, stroke: '#0e3f4f', 'stroke-width': 2 }, head);
+  V.el('text', { x: 150, y: -42, 'text-anchor': 'middle', class: 'lbl-axis' }, head).textContent = 'заделка';
+  const envU = V.el('polyline', { fill: 'none', stroke: '#9a9aa2', 'stroke-width': 1.3, 'stroke-dasharray': '5 4' }, mech);
+  const envD = V.el('polyline', { fill: 'none', stroke: '#9a9aa2', 'stroke-width': 1.3, 'stroke-dasharray': '5 4' }, mech);
+  const ruler = V.el('polyline', { fill: 'none', stroke: '#155e75', 'stroke-width': 5, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, mech);
+  const gNodes = V.el('g', {}, mech);
+  // шкала частот
+  let scale = null;
+
+  function shapePts(amp) { // amp = множитель sin(ωt); клип по вьюбоксу
+    const pts = [];
+    for (let i = 0; i <= 120; i++) {
+      const xx = P.L * i / 120;
+      let y = Y0 - sol.w1(xx) * amp * PXM;
+      y = Math.max(8, Math.min(300, y));
+      pts.push(`${(X0 + xx * PXM).toFixed(1)},${y.toFixed(1)}`);
+    }
+    return pts.join(' ');
+  }
+
+  function rebuild() {
+    sol = solve();
+    PXM = Math.min(2300, 690 / P.L);
+    envU.setAttribute('points', shapePts(1));
+    envD.setAttribute('points', shapePts(-1));
+    gNodes.innerHTML = '';
+    for (const xn of sol.nodes) {
+      V.el('circle', { cx: X0 + xn * PXM, cy: Y0, r: 5, fill: '#b3382e', stroke: '#fff', 'stroke-width': 1.5 }, gNodes);
+      V.el('text', { x: X0 + xn * PXM, y: Y0 - 12, 'text-anchor': 'middle', class: 'lbl', fill: '#b3382e', 'font-size': 13 }, gNodes)
+        .textContent = 'узел';
+    }
+    mech.querySelectorAll('.fscale').forEach((n) => n.remove());
+    const gs = V.el('g', { class: 'fscale' }, mech);
+    scale = V.freqScale(gs, {
+      x0: 330, y0: 385, w: 520, fmax: 30,
+      marks: [
+        { f: sol.lam1, label: `λ₁=${V.fmt(sol.lam1, 2)}`, color: '#b3382e' },
+        { f: sol.lam2, label: `λ₂=${V.fmt(sol.lam2, 2)}`, color: '#b3382e' },
+      ],
+    });
+    scale.set(P.nu, `ν = ${V.fmt(P.nu, 1)} Гц`);
+    const near = Math.min(Math.abs(P.nu - sol.lam1), Math.abs(P.nu - sol.lam2));
+    const badge = document.getElementById('resBadge');
+    if (near < 0.6 || sol.wmax > 0.12) {
+      badge.textContent = 'резонанс! амплитуда растёт неограниченно';
+      badge.className = 'badge bad';
+    } else {
+      badge.textContent = `конец: w₁(L) = ${V.fmt(sol.w1(P.L) * 1000, 1)} мм`;
+      badge.className = 'badge ok';
+    }
+    steps();
+  }
+
+  const f = V.fmt;
+  function fe(x, d = 4) { // короткая экспон. запись
+    if (x === 0) return '0';
+    const e = Math.floor(Math.log10(Math.abs(x)));
+    if (e >= -2 && e <= 3) return f(x, d);
+    return `${f(x / 10 ** e, d)}·10<sup>${e}</sup>`;
+  }
+  function steps() {
+    const s = sol;
+    document.getElementById('steps').innerHTML = `
+    <div class="step"><span class="f">Погонные характеристики: I = bh³/12, m = ρbh</span>
+      <span class="sub">I = 0,025·(${f(P.h * 1000, 1)}·10⁻³)³/12, m = 2350·0,025·${f(P.h * 1000, 1)}·10⁻³</span>
+      <span class="res">I = ${fe(s.I)} м⁴, m = ${f(s.m, 5)} кг/м, EI = ${fe(s.EI)} Н·м²</span></div>
+    <div class="step"><span class="f">Собственные частоты консоли: λ₁ = 3,52/(2πL²)·√(EI/m), λ₂ = 22,04/(2πL²)·√(EI/m)</span>
+      <span class="sub">= {3,52; 22,04}/(2π·${f(P.L ** 2, 4)})·√(${fe(s.EI)}/${f(s.m, 5)})</span>
+      <span class="res">λ₁ = ${f(s.lam1, 3)} Гц, λ₂ = ${f(s.lam2, 3)} Гц</span></div>
+    <div class="step"><span class="f">Волновой аргумент: ω = 2πν, μ = L·(ω²m/EI)<sup>1/4</sup></span>
+      <span class="sub">ω = 2π·${f(P.nu, 1)} = ${f(s.w, 3)} рад/с; μ = ${f(P.L, 2)}·(${f(s.w ** 2, 1)}·${f(s.m, 5)}/${fe(s.EI)})<sup>1/4</sup></span>
+      <span class="res">μ = ${f(s.mu, 6)}</span></div>
+    <div class="step"><span class="f">Форма: w₁(x) = A·sin(μx/L) − B·cos(μx/L) + C·ch(μx/L) + D·sh(μx/L);
+      граничные условия w₁(0) = f, w₁′(0) = 0, w₁″(L) = 0, w₁‴(L) = 0 — система 4×4</span>
+      <span class="res">A = ${f(s.A, 8)}, B = ${f(s.B, 8)}, C = ${f(s.C, 8)}, D = ${f(s.D, 8)}</span></div>
+    <div class="step"><span class="f">Движение: w(x,t) = w₁(x)·sin ωt</span>
+      <span class="res">конец: w₁(L) = ${f(s.w1(P.L) * 1000, 2)} мм ${s.w1(P.L) * P.f < 0 ? '(в противофазе с заделкой)' : '(в фазе с заделкой)'}</span>
+      <span class="cmnt">узлов формы: ${s.nodes.length}${s.nodes.length ? ' (x = ' + s.nodes.map((x) => f(x * 1000, 0) + ' мм').join(', ') + ')' : ''}</span></div>`;
+  }
+
+  const sl = {
+    nu: V.slider('sNu', (v) => { P.nu = v; rebuild(); }),
+    f: V.slider('sF', (v) => { P.f = v / 1000; rebuild(); }),
+    L: V.slider('sL', (v) => { P.L = v / 1000; rebuild(); }),
+    h: V.slider('sH', (v) => { P.h = v / 1000; rebuild(); }),
+  };
+  document.getElementById('bDef').onclick = () => {
+    sl.nu.set(15); sl.f.set(10); sl.L.set(260); sl.h.set(1);
+  };
+
+  V.loop((dt, t) => {
+    if (!sol) return;
+    const ph = Math.sin(sol.w * t);
+    // клип амплитуды у резонанса — только для рисования
+    const clip = sol.wmax > 0.12 ? 0.12 / sol.wmax : 1;
+    ruler.setAttribute('points', shapePts(ph * clip));
+    const yh = Y0 - sol.w1(0) * ph * clip * PXM; // заделка ходит вместе с началом формы: w₁(0) = f
+    head.setAttribute('transform', `translate(50,${yh.toFixed(1)})`);
+    stem.setAttribute('y', yh + 30);
+    stem.setAttribute('height', Math.max(4, 300 - (yh + 30)));
+    stem.setAttribute('x', 188); stem.setAttribute('width', 24);
+  });
+
+  rebuild();
+
+  { // самопроверка с эталонами Mathcad (дефолт ν = 15 Гц)
+    const s = sol;
+    V.selfcheck('m4', [
+      ['μ', s.mu, 4.891180, 1e-5],
+      ['A', s.A, 0.00409696, 1e-7],
+      ['B', s.B, -0.00598006, 1e-7],
+      ['C', s.C, 0.00401994, 1e-7],
+      ['D', s.D, -0.00409696, 1e-7],
+      ['λ1', s.lam1, 2.207, 2e-3],
+      ['λ2', s.lam2, 13.819, 2e-3],
+    ]);
+  }
+})();
+</script>
+</body>
+</html>

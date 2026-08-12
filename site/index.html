@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Вибрация корабля — живой учебный курс</title>
+<meta name="description" content="Учебный сайт по курсу «Вибрация корабля»: конспект теории и пять параметрических анимаций — от массы на пружине до автомобиля на неровной дороге и изгибных форм корпуса судна.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<main class="wrap">
+  <h1>Вибрация корабля</h1>
+  <p class="lead">Почему судно «звенит» на определённых оборотах винта, как считают собственные
+  частоты корпуса и что общего у линейки, зажатой в тиски, с корпусом сухогруза. Семестровый
+  курс СПбГМТУ — в виде живых моделей: каждая формула здесь <b>двигается</b>, а каждый ползунок
+  пересчитывает решение на лету.</p>
+
+  <div class="panel">
+    <svg id="hero" class="anim" viewBox="0 0 920 180"></svg>
+    <div class="caption">Свободные затухающие колебания — «атом» всей теории вибрации.
+    Полная модель с ползунками — в <a href="demo-m1">М1</a>.</div>
+  </div>
+
+  <h2>Пять живых моделей</h2>
+  <p>Каждая модель повторяет расчётный файл кафедры (Mathcad) и сверена с ним по константам —
+  а сверх того анимирована и снабжена решением по шагам.</p>
+  <div class="cards">
+    <a class="card demo" href="demo-m1"><h3>М1. Масса на пружине</h3>
+      <p>Свободные затухающие колебания: частота, огибающая e<sup>−μt</sup>, декремент,
+      апериодический режим. Ползунки M, C, μ, q₀, v₀.</p>
+      <div class="go">Запустить →</div></a>
+    <a class="card demo" href="demo-m2"><h3>М2. Вынужденные колебания</h3>
+      <p>Сила Q₀·sin ωt, переходный процесс и установившийся режим, коэффициент динамичности
+      и резонансная кривая с бегущей точкой.</p>
+      <div class="go">Запустить →</div></a>
+    <a class="card demo" href="demo-m3"><h3>М3. Две массы, две формы</h3>
+      <p>Цепочка из двух масс: частотное уравнение, синфазная и противофазная формы, биения
+      и идея динамического гасителя.</p>
+      <div class="go">Запустить →</div></a>
+    <a class="card demo" href="demo-m4"><h3>М4. Линейка на вибростенде</h3>
+      <p>Консольная балка при кинематическом возмущении заделки: решение 4×4, резонансы
+      консоли и рождение узла формы.</p>
+      <div class="go">Запустить →</div></a>
+    <a class="card demo" href="demo-m5"><h3>М5. Автомобиль по дороге</h3>
+      <p>Две степени свободы, Рунге–Кутта в реальном времени, синусоидальная и случайная
+      дорога, резонансная скорость.</p>
+      <div class="go">Запустить →</div></a>
+  </div>
+
+  <h2>Курс</h2>
+  <div class="cards">
+    <a class="card" href="theory"><h3>Теория</h3>
+      <p>Конспект по 13 темам: возмущающие силы и лопастная частота, затухание, резонанс,
+      системы с n степенями свободы, балки, рамы, пластины, метод Релея.</p>
+      <div class="go">Читать →</div></a>
+    <a class="card" href="hull"><h3>Корпус судна</h3>
+      <p>Общая вибрация: корпус — свободная балка переменного сечения, присоединённая вода,
+      формы с 2–4 узлами и резонансная проверка по лопастной частоте. С живой моделью.</p>
+      <div class="go">Читать →</div></a>
+    <a class="card" href="sources"><h3>Источники</h3>
+      <p>Рукописный конспект лекций СПбГМТУ, Mathcad-модели кафедры и классические книги по
+      вибрации корабля.</p>
+      <div class="go">Смотреть →</div></a>
+  </div>
+
+  <div class="note tip"><b>Как устроен сайт.</b> Никаких библиотек и серверных расчётов:
+  чистый SVG + JavaScript, аналитика решается в браузере, интегрирование — Рунге–Куттой
+  прямо в кадре анимации. Все демо при параметрах по умолчанию сверены с эталонными
+  константами Mathcad-моделей кафедры.</div>
+</main>
+<script src="assets/site.js" data-root="./" data-page="index"></script>
+<script src="assets/vibro.js"></script>
+<script>
+'use strict';
+(() => {
+  /* мини-анимация: пружина + груз + затухающая синусоида */
+  const svg = document.getElementById('hero');
+  V.el('line', { x1: 30, y1: 16, x2: 150, y2: 16, stroke: '#16161a', 'stroke-width': 2.4 }, svg);
+  V.el('path', { d: V.hatch(30, 16, 150, 16, 11, 9, -Math.PI * 0.75), stroke: '#9a9aa2', 'stroke-width': 1.2, fill: 'none' }, svg);
+  const spring = V.el('polyline', { fill: 'none', stroke: '#155e75', 'stroke-width': 2.2 }, svg);
+  const mass = V.el('rect', { x: 60, width: 60, height: 34, rx: 5, fill: '#eceae3', stroke: '#16161a', 'stroke-width': 2 }, svg);
+  const trace = V.el('polyline', { fill: 'none', stroke: '#155e75', 'stroke-width': 2 }, svg);
+  const envU = V.el('polyline', { fill: 'none', stroke: '#9a9aa2', 'stroke-width': 1.2, 'stroke-dasharray': '5 4' }, svg);
+  const envD = V.el('polyline', { fill: 'none', stroke: '#9a9aa2', 'stroke-width': 1.2, 'stroke-dasharray': '5 4' }, svg);
+  const dot = V.el('circle', { r: 4, fill: '#b3382e' }, svg);
+  V.el('line', { x1: 180, y1: 100, x2: 900, y2: 100, stroke: '#e3e1da' }, svg);
+  const mu = 0.35, lam = 5.5, A = 52, Y0 = 100, X0 = 190, XW = 700, TW = 9;
+  const q = (t) => A * Math.exp(-mu * t) * Math.cos(lam * t);
+  [envU, envD].forEach((pl, s) => {
+    const pts = [];
+    for (let i = 0; i <= 200; i++) {
+      const t = TW * i / 200;
+      pts.push(`${(X0 + XW * i / 200).toFixed(1)},${(Y0 + (s ? 1 : -1) * A * Math.exp(-mu * t)).toFixed(1)}`);
+    }
+    pl.setAttribute('points', pts.join(' '));
+  });
+  V.loop((dt, t) => {
+    const tc = t % (TW + 1.2);
+    const tq = Math.min(tc, TW);
+    const y = Y0 + q(tq);
+    mass.setAttribute('y', y - 17);
+    spring.setAttribute('points', V.springPts(90, 16, 90, y - 17, 12, 11));
+    const pts = [];
+    const N = Math.max(2, Math.floor(260 * tq / TW));
+    for (let i = 0; i <= N; i++) {
+      const tt = tq * i / N;
+      pts.push(`${(X0 + XW * tt / TW).toFixed(1)},${(Y0 + q(tt)).toFixed(1)}`);
+    }
+    trace.setAttribute('points', pts.join(' '));
+    dot.setAttribute('cx', X0 + XW * tq / TW); dot.setAttribute('cy', Y0 + q(tq));
+  });
+})();
+</script>
+</body>
+</html>

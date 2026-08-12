@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>М2. Вынужденные колебания и резонансная кривая</title>
+<meta name="description" content="Живая модель: масса на пружине под силой Q0·sin(ωt). Переходный процесс, установившиеся колебания, коэффициент динамичности и резонансная кривая α(ω/λ).">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<main class="wrap">
+  <h1>М2. Вынужденные колебания: сила Q₀·sin ωt</h1>
+  <p class="lead">К той же системе (М1) приложим гармоническую силу:
+  <span class="eq">q̈ + 2μq̇ + λ²q = (Q₀/M)·sin ωt</span>. Сначала виден
+  <b>переходный процесс</b> (затухающие собственные колебания), затем остаются
+  чистые <b>установившиеся</b> колебания с частотой силы и амплитудой
+  <span class="eq">α·Q₀/C</span>. Коэффициент динамичности α — главная кривая всей
+  вибрации: подведите ω к λ и посмотрите на резонанс.</p>
+  <p><a class="theory-link" href="theory#t4">Вынужденные колебания и α</a></p>
+
+  <div class="panel">
+    <div class="boards">
+      <div style="flex:0 1 250px"><svg id="mech" class="anim" viewBox="0 0 260 430"></svg>
+        <div class="caption">Красная стрелка — сила Q(t) = Q₀·sin ωt.</div></div>
+      <div style="flex:2 1 420px"><svg id="graph" class="anim" viewBox="0 0 660 430"></svg>
+        <div class="legend"><span><span class="sw" style="background:#155e75"></span>полное решение q(t)</span>
+          <span><span class="sw" style="background:#9a9aa2;height:2px"></span>±α·Q₀/C (установившийся размах)</span></div></div>
+      <div style="flex:1 1 300px"><svg id="rez" class="anim" viewBox="0 0 360 430"></svg>
+        <div class="caption">Резонансная кривая α(ω/λ); точка — текущая настройка. Кривая
+        перестраивается при изменении μ.</div></div>
+    </div>
+    <div class="controls">
+      <label>ω, рад/с <input type="range" id="sW" min="0.5" max="30" step="0.1" value="5" data-d="1"> <span class="val" data-for="sW"></span></label>
+      <label>μ, 1/с <input type="range" id="sMu" min="0.1" max="8" step="0.1" value="1" data-d="1"> <span class="val" data-for="sMu"></span></label>
+      <label>Q₀, Н <input type="range" id="sQ" min="10" max="300" step="10" value="100" data-d="0"> <span class="val" data-for="sQ"></span></label>
+      <label>M, кг <input type="range" id="sM" min="2" max="50" step="1" value="10" data-d="0"> <span class="val" data-for="sM"></span></label>
+      <label>C, Н/м <input type="range" id="sC" min="200" max="5000" step="50" value="1000" data-d="0"> <span class="val" data-for="sC"></span></label>
+      <button class="btn" id="bReset">Дефолт</button>
+      <button class="btn" id="bRes">В резонанс: ω = λ</button>
+      <span id="alphaBadge" class="badge ok"></span>
+    </div>
+  </div>
+
+  <h2>Решение по шагам</h2>
+  <p class="small">Серым — подстановка текущих значений, жирным — результат.</p>
+  <div class="steps" id="steps"></div>
+
+  <div class="note tip"><b>Что смотреть.</b> Пик кривой — чуть левее ω/λ = 1 (точный максимум при
+  ω = λ√(1−2μ²/λ²)); высота пика ≈ λ/2μ. При ω ≪ λ груз движется «как статика» (α → 1),
+  при ω ≫ λ — не успевает за силой (α → 0, противофаза). Увеличьте μ — пик оседает: так работает
+  демпфирование судовых конструкций.</div>
+  <div class="note"><b>Примечание.</b> Исходный Mathcad-файл этой модели
+  (<code>mass_on_spring_force</code>) остался недописанным — здесь приведено полное решение по
+  теме 4 конспекта: установившаяся часть α·(Q₀/C)·sin(ωt−ε) плюс переходный процесс из нулевых
+  начальных условий.</div>
+
+  <p class="verified">Самопроверка при дефолтах (M=10, C=1000, μ=1, ω=5): α = 1,321635;
+  амплитуда установившихся 0,132164 м — формулы темы 4 конспекта.</p>
+</main>
+<script src="assets/site.js" data-root="./" data-page="demo-m2"></script>
+<script src="assets/vibro.js"></script>
+<script>
+'use strict';
+(() => {
+  const P = { M: 10, C: 1000, mu: 1, w: 5, Q0: 100 };
+  let sol = null, plot = null;
+  let anim = null;
+
+  /* ---------- механика ---------- */
+  const mech = document.getElementById('mech');
+  const gM = V.el('g', {}, mech);
+  V.el('line', { x1: 30, y1: 20, x2: 230, y2: 20, stroke: '#16161a', 'stroke-width': 2.5 }, gM);
+  V.el('path', { d: V.hatch(30, 20, 230, 20, 12, 10, -Math.PI * 0.75), stroke: '#9a9aa2', 'stroke-width': 1.3, fill: 'none' }, gM);
+  const spring = V.el('polyline', { fill: 'none', stroke: '#155e75', 'stroke-width': 2.4, 'stroke-linejoin': 'round' }, gM);
+  const mass = V.el('g', {}, gM);
+  V.el('rect', { x: 65, y: -23, width: 130, height: 46, rx: 5, fill: '#eceae3', stroke: '#16161a', 'stroke-width': 2 }, mass);
+  V.el('text', { x: 130, y: 6, 'text-anchor': 'middle', class: 'lbl' }, mass).textContent = 'M';
+  const farr = V.el('line', { stroke: '#b3382e', 'stroke-width': 3, 'marker-end': 'url(#arrR)' }, gM);
+  const flbl = V.el('text', { x: 148, y: 0, class: 'lbl', fill: '#b3382e' }, gM);
+  const Y0 = 235, SCALE = 380;
+  function drawMech(q, t) {
+    const qc = Math.max(-0.33, Math.min(0.33, q));
+    const yc = Y0 + qc * SCALE;
+    mass.setAttribute('transform', `translate(0,${yc.toFixed(1)})`);
+    spring.setAttribute('points', V.springPts(130, 20, 130, yc - 23, 18, 14));
+    const F = Math.sin(P.w * t); // ±1
+    const len = 12 + Math.abs(F) * 55;
+    farr.setAttribute('x1', 130); farr.setAttribute('x2', 130);
+    if (F >= 0) { farr.setAttribute('y1', yc + 23); farr.setAttribute('y2', yc + 23 + len); }
+    else { farr.setAttribute('y1', yc - 23); farr.setAttribute('y2', yc - 23 - len); }
+    flbl.setAttribute('y', F >= 0 ? yc + 40 : yc - 40);
+    flbl.textContent = 'Q(t)';
+  }
+
+  /* ---------- аналитика: установившийся + переходный ---------- */
+  function alphaOf(w, mu, lam) {
+    const z2 = (w / lam) ** 2;
+    return 1 / Math.sqrt((1 - z2) ** 2 + 4 * mu * mu * w * w / lam ** 4);
+  }
+  function solve() {
+    const { M, C, mu, w, Q0 } = P;
+    const lam = Math.sqrt(C / M);
+    const al = alphaOf(w, mu, lam);
+    const aSt = Q0 / C;                        // статический прогиб
+    const amp = al * aSt;                      // установившаяся амплитуда
+    const eps = Math.atan2(2 * mu * w, lam * lam - w * w); // сдвиг фазы 0..π
+    const qp = (t) => amp * Math.sin(w * t - eps);
+    const qp0 = qp(0), vp0 = amp * w * Math.cos(-eps);
+    let qh;
+    if (mu < lam - 1e-9) {
+      const l1 = Math.sqrt(lam * lam - mu * mu);
+      const B1 = -qp0;
+      const B2 = (-vp0 + mu * B1) / l1;
+      qh = (t) => Math.exp(-mu * t) * (B1 * Math.cos(l1 * t) + B2 * Math.sin(l1 * t));
+    } else {
+      const beta = Math.sqrt(Math.max(1e-9, mu * mu - lam * lam));
+      const C1 = (-vp0 + (mu + beta) * (-qp0)) / (2 * beta);
+      const C2 = -qp0 - C1;
+      qh = (t) => C1 * Math.exp((-mu + beta) * t) + C2 * Math.exp((-mu - beta) * t);
+    }
+    return { lam, al, aSt, amp, eps, q: (t) => qp(t) + qh(t) };
+  }
+
+  /* ---------- резонансная кривая ---------- */
+  const rez = document.getElementById('rez');
+  let rzDot, rzCurve, rzX, rzY, rzCap = 6;
+  function buildRez() {
+    rez.innerHTML = '';
+    const x0 = 44, y0 = 18, w = 296, h = 366;
+    const { lam, mu } = { lam: sol.lam, mu: P.mu };
+    rzCap = Math.max(3, Math.min(14, lam / (2 * mu) * 1.15));
+    V.el('rect', { x: x0, y: y0, width: w, height: h, fill: '#fff', stroke: '#d8d6cf' }, rez);
+    rzX = (z) => x0 + (z / 3) * w;
+    rzY = (a) => y0 + h - (Math.min(a, rzCap * 1.05) / rzCap) * h * 0.96;
+    // сетка
+    for (let z = 0.5; z < 3; z += 0.5)
+      V.el('line', { x1: rzX(z), y1: y0, x2: rzX(z), y2: y0 + h, stroke: z === 1 ? '#e6b8b4' : '#ececec', ...(z === 1 ? { 'stroke-dasharray': '5 4' } : {}) }, rez);
+    V.el('line', { x1: x0, y1: rzY(1), x2: x0 + w, y2: rzY(1), stroke: '#ececec' }, rez);
+    [0, 1, 2, 3].forEach((z) => V.el('text', { x: rzX(z), y: y0 + h + 14, 'text-anchor': 'middle', class: 'lbl-axis' }, rez).textContent = V.fmt(z, 0));
+    V.el('text', { x: x0 + w - 6, y: y0 + h - 8, 'text-anchor': 'end', class: 'lbl-axis' }, rez).textContent = 'ω/λ';
+    V.el('text', { x: x0 + 6, y: y0 + 14, class: 'lbl-axis' }, rez).textContent = 'α';
+    V.el('text', { x: rzX(1), y: y0 + 14, 'text-anchor': 'middle', class: 'lbl', fill: '#b3382e', 'font-size': 13 }, rez).textContent = 'резонанс';
+    V.el('text', { x: x0 - 8, y: rzY(1) + 4, 'text-anchor': 'end', class: 'lbl-axis' }, rez).textContent = '1';
+    const pts = [];
+    for (let i = 0; i <= 300; i++) {
+      const z = 3 * i / 300;
+      pts.push(`${rzX(z).toFixed(1)},${rzY(alphaOf(z * sol.lam, P.mu, sol.lam)).toFixed(1)}`);
+    }
+    rzCurve = V.el('polyline', { points: pts.join(' '), fill: 'none', stroke: '#b3382e', 'stroke-width': 2.2 }, rez);
+    rzDot = V.el('circle', { r: 5.5, fill: '#155e75', stroke: '#fff', 'stroke-width': 1.5 }, rez);
+    rzDot.setAttribute('cx', rzX(P.w / sol.lam));
+    rzDot.setAttribute('cy', rzY(sol.al));
+  }
+
+  /* ---------- сборка ---------- */
+  const graph = document.getElementById('graph');
+  function rebuild() {
+    sol = solve();
+    let ymax = 0.02;
+    const t1 = Math.max(4, Math.min(16, 5 / Math.max(P.mu, 0.3)));
+    for (let t = 0; t <= t1; t += t1 / 500) ymax = Math.max(ymax, Math.abs(sol.q(t)));
+    ymax *= 1.15;
+    graph.innerHTML = '';
+    plot = V.plot(graph, {
+      x0: 46, y0: 18, w: 596, h: 380, t1, ymin: -ymax, ymax,
+      series: [{ color: '#155e75', w: 2 }], ylab: 'q, м',
+    });
+    plot.curve(() => sol.amp, { stroke: '#9a9aa2', 'stroke-width': 1.4, 'stroke-dasharray': '5 4' });
+    plot.curve(() => -sol.amp, { stroke: '#9a9aa2', 'stroke-width': 1.4, 'stroke-dasharray': '5 4' });
+    buildRez();
+    const b = document.getElementById('alphaBadge');
+    b.textContent = `α = ${V.fmt(sol.al, 3)}`;
+    b.className = 'badge ' + (sol.al > 2.5 ? 'bad' : 'ok');
+    steps();
+    if (anim) anim.reset();
+  }
+
+  const f = V.fmt;
+  function steps() {
+    const s = sol;
+    document.getElementById('steps').innerHTML = `
+    <div class="step"><span class="f">λ = √(C/M)</span>
+      <span class="sub">= √(${f(P.C, 0)}/${f(P.M, 0)})</span>
+      <span class="res">= ${f(s.lam, 5)} рад/с</span>
+      <span class="cmnt">расстройка ω/λ = ${f(P.w / s.lam, 4)}</span></div>
+    <div class="step"><span class="f">Коэффициент динамичности: α = 1/√((1 − ω²/λ²)² + 4μ²ω²/λ⁴)</span>
+      <span class="sub">= 1/√((1 − ${f((P.w / s.lam) ** 2, 4)})² + ${f(4 * P.mu ** 2 * P.w ** 2 / s.lam ** 4, 6)})</span>
+      <span class="res">= ${f(s.al, 6)}</span></div>
+    <div class="step"><span class="f">Статический прогиб: q<sub>ст</sub> = Q₀/C</span>
+      <span class="sub">= ${f(P.Q0, 0)}/${f(P.C, 0)}</span>
+      <span class="res">= ${f(s.aSt, 4)} м</span></div>
+    <div class="step"><span class="f">Амплитуда установившихся колебаний: a = α·Q₀/C</span>
+      <span class="sub">= ${f(s.al, 4)}·${f(s.aSt, 4)}</span>
+      <span class="res">= ${f(s.amp, 6)} м</span></div>
+    <div class="step"><span class="f">Сдвиг фазы: ε = arctg(2μω/(λ² − ω²))</span>
+      <span class="sub">= arctg(${f(2 * P.mu * P.w, 2)}/${f(s.lam ** 2 - P.w ** 2, 2)})</span>
+      <span class="res">= ${f(s.eps, 5)} рад</span></div>
+    <div class="step"><span class="f">Полное решение:</span>
+      <span class="res">q(t) = ${f(s.amp, 5)}·sin(${f(P.w, 1)}t − ${f(s.eps, 4)}) + переходный e<sup>−μt</sup>(…)</span>
+      <span class="cmnt">константы переходного — из нулевых начальных условий q(0)=0, q̇(0)=0</span></div>`;
+  }
+
+  const sl = {
+    w: V.slider('sW', (v) => { P.w = v; rebuild(); }),
+    mu: V.slider('sMu', (v) => { P.mu = v; rebuild(); }),
+    Q0: V.slider('sQ', (v) => { P.Q0 = v; rebuild(); }),
+    M: V.slider('sM', (v) => { P.M = v; rebuild(); }),
+    C: V.slider('sC', (v) => { P.C = v; rebuild(); }),
+  };
+  document.getElementById('bReset').onclick = () => {
+    sl.M.set(10); sl.C.set(1000); sl.mu.set(1); sl.Q0.set(100); sl.w.set(5);
+  };
+  document.getElementById('bRes').onclick = () => { sl.w.set(Math.sqrt(P.C / P.M)); };
+
+  anim = V.loop(() => {
+    if (!sol || !plot) return;
+    const tCur = anim.t % (plot.t1 + 0.8);
+    const tq = Math.min(tCur, plot.t1);
+    drawMech(sol.q(tq), tq);
+    plot.draw([sol.q], tCur);
+  });
+
+  rebuild();
+
+  { // самопроверка (полное решение по теме 4; Mathcad-файл модели не дописан)
+    const s = sol;
+    V.selfcheck('m2', [
+      ['λ', s.lam, 10, 1e-9],
+      ['α(ω=5)', s.al, 1.321635, 1e-5],
+      ['амплитуда', s.amp, 0.1321635, 1e-6],
+      ['q(0)=0', s.q(0), 0, 1e-12],
+      ['q̇(0)=0', (s.q(1e-7) - s.q(0)) / 1e-7, 0, 1e-4],
+    ]);
+  }
+})();
+</script>
+</body>
+</html>

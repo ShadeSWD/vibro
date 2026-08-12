@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>М3. Две массы на двух пружинах: формы колебаний</title>
+<meta name="description" content="Живая модель цепочки из двух масс: собственные частоты и формы, синфазные и противофазные колебания, биения, динамический гаситель. Ползунки масс и жёсткостей.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<main class="wrap">
+  <h1>М3. Две массы: две частоты, две формы</h1>
+  <p class="lead">Цепочка: к потолку на пружине <i>c</i>₁ подвешена масса <i>m</i>₁, к ней на
+  пружине <i>c</i>₂ — масса <i>m</i>₂. У системы <b>две</b> собственные частоты и две формы
+  колебаний; любое движение — их сумма. По умолчанию нижней массе сообщён толчок
+  <i>v</i>₂₀ = 5 м/с — как в Mathcad-модели <code>two_mass_on_spring</code>.</p>
+  <p><a class="theory-link" href="theory#t5">Системы с n степенями свободы</a>
+     <a class="theory-link" href="theory#t6">Динамический гаситель</a></p>
+
+  <div class="panel">
+    <div class="boards">
+      <div style="flex:0 1 280px"><svg id="mech" class="anim" viewBox="0 0 280 500"></svg>
+        <div class="caption">Масштаб отклонений подбирается автоматически.</div></div>
+      <div style="flex:2 1 460px"><svg id="graph" class="anim" viewBox="0 0 660 500"></svg>
+        <div class="legend"><span><span class="sw" style="background:#155e75"></span>q₁(t) — верхняя масса</span>
+          <span><span class="sw" style="background:#b3382e"></span>q₂(t) — нижняя масса</span></div></div>
+    </div>
+    <div class="controls">
+      <label>m₁, кг <input type="range" id="sM1" min="0.5" max="20" step="0.5" value="1" data-d="1"> <span class="val" data-for="sM1"></span></label>
+      <label>m₂, кг <input type="range" id="sM2" min="0.1" max="20" step="0.1" value="10" data-d="1"> <span class="val" data-for="sM2"></span></label>
+      <label>c₁, Н/м <input type="range" id="sC1" min="10" max="2000" step="10" value="50" data-d="0"> <span class="val" data-for="sC1"></span></label>
+      <label>c₂, Н/м <input type="range" id="sC2" min="10" max="2000" step="10" value="1000" data-d="0"> <span class="val" data-for="sC2"></span></label>
+      <label>v₂₀, м/с <input type="range" id="sV20" min="-10" max="10" step="0.5" value="5" data-d="1"> <span class="val" data-for="sV20"></span></label>
+    </div>
+    <div class="controls">
+      <button class="btn primary" id="bPush">Толчок v₂₀</button>
+      <button class="btn" id="bF1">Возбудить форму 1</button>
+      <button class="btn" id="bF2">Возбудить форму 2</button>
+      <button class="btn" id="bBeat">Биения</button>
+      <button class="btn" id="bDef">Дефолт (Mathcad)</button>
+      <span class="badge ok" id="freqBadge"></span>
+    </div>
+  </div>
+
+  <h2>Решение по шагам</h2>
+  <p class="small">Серым — подстановка текущих значений, жирным — результат. При дефолте числа
+  совпадают с Mathcad-моделью (собственные числа матрицы, константы A и фазы ε).</p>
+  <div class="steps" id="steps"></div>
+
+  <div class="note tip"><b>Две формы.</b> Кнопка «Форма 1» задаёт начальные отклонения точно по
+  первой форме — обе массы качаются <b>синфазно</b> на одной (низкой) частоте, картинка не
+  «плывёт». «Форма 2» — <b>противофазная</b> быстрая форма: верхняя масса почти стоит, нижняя
+  дрожит. Любые другие начальные условия дают смесь двух форм.</div>
+  <div class="note"><b>Биения.</b> Кнопка «Биения» настраивает систему так, чтобы частоты стали
+  близкими (λ₁ ≈ 9,5, λ₂ ≈ 10,5 рад/с): энергия медленно перекачивается между массами, амплитуда
+  q₁ «дышит» с частотой λ₂ − λ₁.</div>
+  <div class="note"><b>Динамический гаситель колебаний.</b> Малую массу m₂ на пружине c₂
+  подвешивают к конструкции m₁ и настраивают √(c₂/m₂) на частоту возмущающей силы: тогда
+  гаситель колеблется в противофазе и гасит движение основной массы. Именно так борются с
+  вибрацией мачт, перекрытий и фундаментов механизмов на судах — а наша модель показывает его
+  «скелет»: попробуйте форму 2 — верхняя масса почти неподвижна, всё движение забирает нижняя.</div>
+
+  <p class="verified">Сверено с Mathcad-моделью кафедры (two_mass_on_spring): λ₁ = 2,089112;
+  λ₂ = 33,847239; |A₁₁| = 2,0971012; |A₁₂| = 0,12943684; |A₂₁| = 2,1928037; |A₂₂| = 0,012378771;
+  ε₁ = 3π, ε₂ = π.</p>
+</main>
+<script src="assets/site.js" data-root="./" data-page="demo-m3"></script>
+<script src="assets/vibro.js"></script>
+<script>
+'use strict';
+(() => {
+  const P = { m1: 1, m2: 10, c1: 50, c2: 1000, v20: 5 };
+  let IC = { q10: 0, q20: 0, v10: 0, v20: 5 };  // текущее возбуждение
+  let icMode = 'push';
+  let sol = null, plot = null, dispScale = 60;
+  let anim = null;
+
+  /* ---------- аналитика ---------- */
+  function solve() {
+    const { m1, m2, c1, c2 } = P;
+    const k11 = (c1 + c2) / m1, k12 = -c2 / m1, k21 = -c2 / m2, k22 = c2 / m2;
+    const tr = k11 + k22, det = k11 * k22 - k12 * k21;
+    const D = Math.sqrt(Math.max(0, tr * tr - 4 * det));
+    const s1 = (tr - D) / 2, s2 = (tr + D) / 2;
+    const l1 = Math.sqrt(s1), l2 = Math.sqrt(s2);
+    const r1 = (k11 - s1) * m1 / c2, r2 = (k11 - s2) * m1 / c2; // φ2/φ1 форм
+    // константы из НУ: q(t) = Σ φ_n (a_n cos λ_n t + b_n sin λ_n t), φ_n = (1, r_n)
+    const { q10, q20, v10, v20 } = IC;
+    const a2 = (q20 - r1 * q10) / (r2 - r1), a1 = q10 - a2;
+    const u2 = (v20 - r1 * v10) / (r2 - r1), u1 = v10 - u2;
+    const b1 = u1 / l1, b2 = u2 / l2;
+    const q1 = (t) => a1 * Math.cos(l1 * t) + b1 * Math.sin(l1 * t)
+                    + a2 * Math.cos(l2 * t) + b2 * Math.sin(l2 * t);
+    const q2 = (t) => r1 * (a1 * Math.cos(l1 * t) + b1 * Math.sin(l1 * t))
+                    + r2 * (a2 * Math.cos(l2 * t) + b2 * Math.sin(l2 * t));
+    return { k11, k12, k21, k22, tr, det, s1, s2, l1, l2, r1, r2, a1, a2, b1, b2, q1, q2 };
+  }
+
+  /* ---------- механика ---------- */
+  const mech = document.getElementById('mech');
+  V.el('line', { x1: 40, y1: 20, x2: 240, y2: 20, stroke: '#16161a', 'stroke-width': 2.5 }, mech);
+  V.el('path', { d: V.hatch(40, 20, 240, 20, 12, 10, -Math.PI * 0.75), stroke: '#9a9aa2', 'stroke-width': 1.3, fill: 'none' }, mech);
+  const spr1 = V.el('polyline', { fill: 'none', stroke: '#155e75', 'stroke-width': 2.4 }, mech);
+  const spr2 = V.el('polyline', { fill: 'none', stroke: '#b3382e', 'stroke-width': 2.4 }, mech);
+  const mass1 = V.el('g', {}, mech);
+  V.el('rect', { x: 75, y: -22, width: 130, height: 44, rx: 5, fill: '#eceae3', stroke: '#16161a', 'stroke-width': 2 }, mass1);
+  const m1Lbl = V.el('text', { x: 140, y: 5, 'text-anchor': 'middle', class: 'lbl' }, mass1);
+  const mass2 = V.el('g', {}, mech);
+  V.el('rect', { x: 92, y: -19, width: 96, height: 38, rx: 5, fill: '#e7eef1', stroke: '#16161a', 'stroke-width': 2 }, mass2);
+  const m2Lbl = V.el('text', { x: 140, y: 5, 'text-anchor': 'middle', class: 'lbl' }, mass2);
+  V.el('text', { x: 66, y: 110, class: 'lbl', fill: '#155e75' }, mech).textContent = 'c₁';
+  const c2lbl = V.el('text', { x: 66, y: 0, class: 'lbl', fill: '#b3382e' }, mech);
+  c2lbl.textContent = 'c₂';
+  const Y1 = 190, Y2 = 380;
+  function drawMech(q1, q2) {
+    const d1 = Math.max(-75, Math.min(75, q1 * dispScale));
+    const d2 = Math.max(-85, Math.min(85, q2 * dispScale));
+    const y1 = Y1 + d1, y2 = Y2 + d2;
+    mass1.setAttribute('transform', `translate(0,${y1.toFixed(1)})`);
+    mass2.setAttribute('transform', `translate(0,${y2.toFixed(1)})`);
+    spr1.setAttribute('points', V.springPts(140, 20, 140, y1 - 22, 14, 14));
+    spr2.setAttribute('points', V.springPts(140, y1 + 22, 140, y2 - 19, 12, 12));
+    c2lbl.setAttribute('y', (y1 + y2) / 2);
+  }
+
+  /* ---------- сборка ---------- */
+  const graph = document.getElementById('graph');
+  function rebuild() {
+    sol = solve();
+    const T1 = 2 * Math.PI / sol.l1;
+    let t1 = Math.max(4, Math.min(20, 3 * T1));
+    if (sol.l2 - sol.l1 < 0.25 * sol.l1) { // близкие частоты — показать полное биение
+      t1 = Math.min(40, 2.2 * 2 * Math.PI / (sol.l2 - sol.l1));
+    }
+    let ymax = 1e-6;
+    for (let t = 0; t <= t1; t += t1 / 800)
+      ymax = Math.max(ymax, Math.abs(sol.q1(t)), Math.abs(sol.q2(t)));
+    dispScale = 60 / ymax;
+    ymax *= 1.12;
+    graph.innerHTML = '';
+    plot = V.plot(graph, {
+      x0: 46, y0: 18, w: 596, h: 440, t1, ymin: -ymax, ymax,
+      series: [{ color: '#155e75', w: 2 }, { color: '#b3382e', w: 2 }], ylab: 'q',
+    });
+    m1Lbl.textContent = `m₁ = ${V.fmt(P.m1, 1)}`;
+    m2Lbl.textContent = `m₂ = ${V.fmt(P.m2, 1)}`;
+    document.getElementById('freqBadge').textContent =
+      `λ₁ = ${V.fmt(sol.l1, 3)}  ·  λ₂ = ${V.fmt(sol.l2, 3)} рад/с`;
+    steps();
+    if (anim) anim.reset();
+  }
+
+  const f = V.fmt;
+  function steps() {
+    const s = sol;
+    const isDefault = P.m1 === 1 && P.m2 === 10 && P.c1 === 50 && P.c2 === 1000
+      && icMode === 'push' && IC.v20 === 5;
+    document.getElementById('steps').innerHTML = `
+    <div class="step"><span class="f">Уравнения движения: m₁q̈₁ = −c₁q₁ + c₂(q₂−q₁); m₂q̈₂ = −c₂(q₂−q₁) → q̈ + K·q = 0</span></div>
+    <div class="step"><span class="f">Матрица K = [[(c₁+c₂)/m₁, −c₂/m₁], [−c₂/m₂, c₂/m₂]]</span>
+      <span class="sub">= [[(${f(P.c1, 0)}+${f(P.c2, 0)})/${f(P.m1, 1)}, −${f(P.c2, 0)}/${f(P.m1, 1)}], [−${f(P.c2, 0)}/${f(P.m2, 1)}, ${f(P.c2, 0)}/${f(P.m2, 1)}]]</span>
+      <span class="res">= [[${f(s.k11, 1)}, ${f(s.k12, 1)}], [${f(s.k21, 1)}, ${f(s.k22, 1)}]]</span></div>
+    <div class="step"><span class="f">Частотное уравнение: det(K − λ²E) = 0 → λ⁴ − ${f(s.tr, 2)}·λ² + ${f(s.det, 2)} = 0</span>
+      <span class="sub">λ² = (${f(s.tr, 1)} ∓ √(${f(s.tr, 1)}² − 4·${f(s.det, 1)}))/2 = {${f(s.s1, 5)}; ${f(s.s2, 5)}}</span>
+      <span class="res">λ₁ = ${f(s.l1, 6)}, λ₂ = ${f(s.l2, 6)} рад/с</span></div>
+    <div class="step"><span class="f">Формы (отношение q₂/q₁): rₙ = (K₁₁ − λₙ²)·m₁/c₂</span>
+      <span class="res">r₁ = ${f(s.r1, 6)} (синфазная), r₂ = ${f(s.r2, 6)} (противофазная)</span></div>
+    <div class="step"><span class="f">Константы из 4 начальных условий (q₁₀=${f(IC.q10, 2)}, q₂₀=${f(IC.q20, 2)}, v₁₀=${f(IC.v10, 2)}, v₂₀=${f(IC.v20, 2)}):</span>
+      <span class="res">q₁(t) = ${term(s.a1, s.b1, s.l1)} + ${term(s.a2, s.b2, s.l2)}</span></div>
+    <div class="step"><span class="res">q₂(t) = ${term(s.r1 * s.a1, s.r1 * s.b1, s.l1)} + ${term(s.r2 * s.a2, s.r2 * s.b2, s.l2)}</span></div>
+    ${isDefault ? `<div class="step"><span class="cmnt">Форма записи Mathcad: qᵢ(t) = Aᵢ₁·sin(λ₁t+ε₁) + Aᵢ₂·sin(λ₂t+ε₂) с
+      A₁₁ = −${f(Math.abs(s.b1), 7)}, A₁₂ = ${f(Math.abs(s.b2), 8)}, A₂₁ = −${f(Math.abs(s.r1 * s.b1), 7)},
+      A₂₂ = −${f(Math.abs(s.r2 * s.b2), 9)}, ε₁ = 3π, ε₂ = π — это то же самое:
+      sin(x+3π) = sin(x+π) = −sin x.</span></div>` : ''}`;
+  }
+  function term(a, b, l) {
+    const parts = [];
+    if (Math.abs(a) > 1e-9) parts.push(`${f(a, 4)}·cos(${f(l, 4)}t)`);
+    if (Math.abs(b) > 1e-9) parts.push(`${f(b, 4)}·sin(${f(l, 4)}t)`);
+    return parts.length ? parts.join(' + ').replace(/\+ −/g, '− ') : '0';
+  }
+
+  /* ---------- контролы ---------- */
+  function setIC(mode) {
+    icMode = mode;
+    const s = solve0();
+    if (mode === 'push') IC = { q10: 0, q20: 0, v10: 0, v20: P.v20 };
+    else if (mode === 'f1') IC = { q10: 1, q20: s.r1, v10: 0, v20: 0 };
+    else if (mode === 'f2') IC = { q10: 1, q20: s.r2, v10: 0, v20: 0 };
+    rebuild();
+  }
+  function solve0() { const keep = IC; IC = { q10: 0, q20: 0, v10: 0, v20: 1 }; const s = solve(); IC = keep; return s; }
+  const sl = {
+    m1: V.slider('sM1', (v) => { P.m1 = v; setIC(icMode); }),
+    m2: V.slider('sM2', (v) => { P.m2 = v; setIC(icMode); }),
+    c1: V.slider('sC1', (v) => { P.c1 = v; setIC(icMode); }),
+    c2: V.slider('sC2', (v) => { P.c2 = v; setIC(icMode); }),
+    v20: V.slider('sV20', (v) => { P.v20 = v; if (icMode === 'push') setIC('push'); }),
+  };
+  const btns = { bPush: 'push', bF1: 'f1', bF2: 'f2' };
+  for (const [id, mode] of Object.entries(btns)) {
+    document.getElementById(id).addEventListener('click', (e) => {
+      document.querySelectorAll('.controls button').forEach((b) => b.classList.remove('on'));
+      e.target.classList.add('on');
+      setIC(mode);
+    });
+  }
+  document.getElementById('bBeat').addEventListener('click', (e) => {
+    document.querySelectorAll('.controls button').forEach((b) => b.classList.remove('on'));
+    e.target.classList.add('on');
+    sl.c1.set(1000); sl.m1.set(10); sl.c2.set(10); sl.m2.set(0.1);
+    icMode = 'beat'; IC = { q10: 0, q20: 1, v10: 0, v20: 0 };
+    rebuild();
+  });
+  document.getElementById('bDef').addEventListener('click', () => {
+    document.querySelectorAll('.controls button').forEach((b) => b.classList.remove('on'));
+    sl.m1.set(1); sl.m2.set(10); sl.c1.set(50); sl.c2.set(1000); sl.v20.set(5);
+    setIC('push');
+  });
+
+  /* ---------- анимация ---------- */
+  anim = V.loop(() => {
+    if (!sol || !plot) return;
+    const tCur = anim.t % (plot.t1 + 0.8);
+    const tq = Math.min(tCur, plot.t1);
+    drawMech(sol.q1(tq), sol.q2(tq));
+    plot.draw([sol.q1, sol.q2], tCur);
+  });
+
+  rebuild();
+
+  /* ---------- самопроверка с эталонами Mathcad ---------- */
+  {
+    const s = sol; // дефолт: толчок v20=5
+    V.selfcheck('m3', [
+      ['K11', s.k11, 1050, 1e-9],
+      ['K12', s.k12, -1000, 1e-9],
+      ['K21', s.k21, -100, 1e-9],
+      ['K22', s.k22, 100, 1e-9],
+      ['λ1', s.l1, 2.089112, 1e-6],
+      ['λ2', s.l2, 33.847239, 1e-5],
+      ['|A11|', Math.abs(s.b1), 2.0971012, 1e-6],
+      ['|A12|', Math.abs(s.b2), 0.12943684, 1e-7],
+      ['|A21|', Math.abs(s.r1 * s.b1), 2.1928037, 1e-6],
+      ['|A22|', Math.abs(s.r2 * s.b2), 0.012378771, 1e-8],
+    ]);
+  }
+})();
+</script>
+</body>
+</html>
