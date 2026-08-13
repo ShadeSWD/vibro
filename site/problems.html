@@ -157,6 +157,8 @@
     вращения нельзя.<br>
     <b>Найти.</b> Параметры динамического гасителя массой 5 % от основной и границы
     новой опасной зоны.</p>
+
+    <svg viewBox="0 0 720 240" class="anim" id="svgP3"></svg>
     <div class="steps">
       <div class="step"><b>1.</b> Условие настройки гасителя (<a href="t-two#absorber">§ 3.4</a>):
       \(c_2/m_2 = \omega^{2}\). Масса гасителя
@@ -472,6 +474,8 @@
     Каждый создаёт в переборке колебания скорости с амплитудами \(v_1 = 1{,}2\) мм/с и
     \(v_2 = 0{,}9\) мм/с на частоте своего вала.<br>
     <b>Найти.</b> Период биений и размах пульсаций уровня.</p>
+
+    <svg viewBox="0 0 720 230" class="anim" id="svgP9"></svg>
     <div class="steps">
       <div class="step"><b>1.</b> Частоты возбуждения:
       \(f_1 = n_1/60\) <span class="sub">\(= 750/60\)</span> = <span class="res">12,50 Гц</span>;
@@ -513,6 +517,8 @@
     (из задачи 5), декремент \(\delta = 0{,}05\).<br>
     <b>Найти.</b> Амплитуду и ускорение упругих колебаний корпуса после удара
     и время их затухания.</p>
+
+    <svg viewBox="0 0 720 230" class="anim" id="svgP10"></svg>
     <div class="steps">
       <div class="step"><b>1.</b> Интеграл Дюамеля (<a href="t-single#duhamel">§ 2.4</a>)
       для короткого импульса вырождается: сила не успевает сместить систему, но сообщает
@@ -668,6 +674,8 @@
     погонная масса вместе с настилом и грузом \(m = 45\) кг/м.<br>
     <b>Найти.</b> Первую частоту при трёх вариантах закрепления концов и сделать вывод
     о выборе расчётной схемы.</p>
+
+    <svg viewBox="0 0 720 230" class="anim" id="svgP13"></svg>
     <div class="steps">
       <div class="step"><b>1.</b> Общая формула (<a href="t-beams#sep">§ 4.2</a>):
       \(\lambda_1 = \dfrac{\mu_1^{2}}{l^{2}}\sqrt{\dfrac{EI}{m}}\); закрепление входит
@@ -1280,6 +1288,154 @@
   }
 
   V.selfcheck('problems', R);
+
+  /* ===== З3: динамический гаситель — анимация ===== */
+  {
+    const svg = document.getElementById('svgP3');
+    if (svg) {
+      const x0 = 150, yBase = 190;
+      el('rect', { x: 40, y: yBase, width: 300, height: 14, fill: '#eceae3', stroke: '#16161a', 'stroke-width': 1.2 }, svg);
+      el('path', { d: V.hatch(40, yBase + 14, 340, yBase + 14, 12, 9, -Math.PI * 0.75), stroke: '#9a9aa2', 'stroke-width': 1, fill: 'none' }, svg);
+      const springMain = el('polyline', { fill: 'none', stroke: '#155e75', 'stroke-width': 2 }, svg);
+      const mass = el('rect', { x: x0 - 46, width: 92, height: 40, rx: 4, fill: '#eef3ff', stroke: '#16161a', 'stroke-width': 2 }, svg);
+      el('text', { x: x0, y: 214, 'text-anchor': 'middle', class: 'lbl', 'font-size': 13 }, svg).textContent = 'механизм m₁ = 2000 кг';
+      const springAbs = el('polyline', { fill: 'none', stroke: '#b3382e', 'stroke-width': 1.8 }, svg);
+      const abs = el('rect', { x: x0 - 22, width: 44, height: 20, rx: 3, fill: '#fdf0ef', stroke: '#b3382e', 'stroke-width': 1.8 }, svg);
+      const lblAbs = el('text', { x: x0 + 34, class: 'lbl', fill: '#b3382e', 'font-size': 12.5 }, svg);
+      lblAbs.textContent = 'гаситель m₂ = 100 кг';
+      // правая часть — амплитуды
+      const bx = 400;
+      el('text', { x: bx, y: 26, class: 'lbl', 'font-size': 13, fill: '#6b6b74' }, svg).textContent = 'амплитуда механизма на частоте возмущения';
+      const barBg1 = el('rect', { x: bx, y: 44, width: 260, height: 18, fill: '#f1f1f4' }, svg);
+      const bar1 = el('rect', { x: bx, y: 44, height: 18, fill: '#b3382e', opacity: .75 }, svg);
+      el('text', { x: bx, y: 78, class: 'lbl', 'font-size': 12.5 }, svg).textContent = 'без гасителя: 1,91 мм';
+      const barBg2 = el('rect', { x: bx, y: 96, width: 260, height: 18, fill: '#f1f1f4' }, svg);
+      const bar2 = el('rect', { x: bx, y: 96, height: 18, fill: '#1a7f37', opacity: .75 }, svg);
+      el('text', { x: bx, y: 130, class: 'lbl', 'font-size': 12.5 }, svg).textContent = 'с гасителем: ≈ 0 (гаситель ходит ±1,22 мм)';
+      el('text', { x: bx, y: 166, class: 'lbl', 'font-size': 12.5, fill: '#6b6b74' }, svg).textContent = 'новые резонансы 22,4 и 28,0 Гц';
+      void barBg1; void barBg2;
+      const zig = (x, y1, y2, n, w) => {
+        const p = [];
+        for (let i = 0; i <= n; i++) p.push(`${(x + (i % 2 ? w : -w) * (i === 0 || i === n ? 0 : 1)).toFixed(1)},${(y1 + (y2 - y1) * i / n).toFixed(1)}`);
+        return p.join(' ');
+      };
+      V.loop((dt, t) => {
+        const w = 2 * Math.PI * 1.0;                       // замедленно для наглядности
+        const yM = 120 + 0.6 * Math.sin(w * t);            // механизм почти стоит
+        const yA = yM + 46 + 16 * Math.sin(w * t + Math.PI); // гаситель в противофазе
+        mass.setAttribute('y', yM);
+        springMain.setAttribute('points', zig(x0, yM + 40, yBase, 10, 9));
+        abs.setAttribute('y', yA);
+        springAbs.setAttribute('points', zig(x0, yM + 40, yA, 8, 6));
+        lblAbs.setAttribute('y', yA + 14);
+        bar1.setAttribute('width', 260 * (0.55 + 0.45 * Math.abs(Math.sin(w * t))));
+        bar2.setAttribute('width', 4);
+      });
+    }
+  }
+
+  /* ===== З9: биения двух генераторов ===== */
+  {
+    const svg = document.getElementById('svgP9');
+    if (svg) {
+      const x0 = 60, W = 600, yc = 120, A = 52;
+      el('line', { x1: x0, y1: yc, x2: x0 + W, y2: yc, stroke: '#b9b9c0', 'stroke-width': 1 }, svg);
+      const sig = el('polyline', { fill: 'none', stroke: '#155e75', 'stroke-width': 1.8 }, svg);
+      const env1 = el('polyline', { fill: 'none', stroke: '#b3382e', 'stroke-width': 1.2, 'stroke-dasharray': '6 4' }, svg);
+      const env2 = el('polyline', { fill: 'none', stroke: '#b3382e', 'stroke-width': 1.2, 'stroke-dasharray': '6 4' }, svg);
+      el('text', { x: x0, y: 26, class: 'lbl', 'font-size': 13, fill: '#6b6b74' }, svg)
+        .textContent = 'сумма двух близких частот: период биений T = 10 с';
+      el('text', { x: x0, y: 214, class: 'lbl', 'font-size': 12.5, fill: '#b3382e' }, svg)
+        .textContent = 'огибающая — «плывущий» уровень шума в каюте';
+      const f1 = 1.0, f2 = 1.1;                             // условные частоты для показа
+      V.loop((dt, t) => {
+        const pts = [], e1 = [], e2 = [];
+        for (let i = 0; i <= 300; i++) {
+          const x = x0 + W * i / 300, tt = t + i / 300 * 12;
+          const v = Math.sin(2 * Math.PI * f1 * tt) + Math.sin(2 * Math.PI * f2 * tt);
+          const env = 2 * Math.abs(Math.cos(Math.PI * (f2 - f1) * tt));
+          pts.push(`${x.toFixed(1)},${(yc - A * v / 2).toFixed(1)}`);
+          e1.push(`${x.toFixed(1)},${(yc - A * env / 2).toFixed(1)}`);
+          e2.push(`${x.toFixed(1)},${(yc + A * env / 2).toFixed(1)}`);
+        }
+        sig.setAttribute('points', pts.join(' '));
+        env1.setAttribute('points', e1.join(' '));
+        env2.setAttribute('points', e2.join(' '));
+      });
+    }
+  }
+
+  /* ===== З10: слеминг — удар и затухание ===== */
+  {
+    const svg = document.getElementById('svgP10');
+    if (svg) {
+      const x0 = 60, W = 600, yc = 130, A = 60;
+      el('line', { x1: x0, y1: yc, x2: x0 + W, y2: yc, stroke: '#b9b9c0', 'stroke-width': 1 }, svg);
+      const resp = el('polyline', { fill: 'none', stroke: '#155e75', 'stroke-width': 1.8 }, svg);
+      const envp = el('polyline', { fill: 'none', stroke: '#b3382e', 'stroke-width': 1.2, 'stroke-dasharray': '5 4' }, svg);
+      const hit = el('line', { y1: yc - 70, y2: yc + 70, stroke: '#b3382e', 'stroke-width': 2 }, svg);
+      el('text', { x: x0, y: 24, class: 'lbl', 'font-size': 13, fill: '#6b6b74' }, svg)
+        .textContent = 'удар днищем → упругие колебания корпуса (whipping), затухают за ~35 с';
+      const lblA = el('text', { x: x0 + W - 6, y: 210, 'text-anchor': 'end', class: 'lbl', 'font-size': 12.5, fill: '#155e75' }, svg);
+      const f = 1.2, mu = 0.09;
+      V.loop((dt, t) => {
+        const tc = (t % 14);                                 // удар раз в 14 с
+        const pts = [], env = [];
+        for (let i = 0; i <= 300; i++) {
+          const x = x0 + W * i / 300, tt = i / 300 * 14;
+          const a = tt < tc ? Math.exp(-mu * (tc - tt) * 0) : 0;
+          const dtm = tt - 0;
+          const v = tt < 0.2 ? 0 : Math.exp(-mu * tt) * Math.sin(2 * Math.PI * f * tt);
+          void a; void dtm;
+          pts.push(`${x.toFixed(1)},${(yc - A * v).toFixed(1)}`);
+          env.push(`${x.toFixed(1)},${(yc - A * Math.exp(-mu * tt)).toFixed(1)}`);
+        }
+        resp.setAttribute('points', pts.join(' '));
+        envp.setAttribute('points', env.join(' '));
+        const xh = x0 + W * (tc / 14);
+        hit.setAttribute('x1', xh); hit.setAttribute('x2', xh);
+        lblA.textContent = 'амплитуда 2,41 мм, ускорение 0,017 g';
+      });
+    }
+  }
+
+  /* ===== З13: три закрепления бимса ===== */
+  {
+    const svg = document.getElementById('svgP13');
+    if (svg) {
+      const cases = [
+        { name: 'шарнир — шарнир', k: 1.00, f: '32,5 Гц', y: 60 },
+        { name: 'заделка — шарнир', k: 1.56, f: '50,8 Гц', y: 130 },
+        { name: 'заделка — заделка', k: 2.27, f: '73,8 Гц', y: 200 },
+      ];
+      const x0 = 90, W = 380;
+      const lines = cases.map(c => {
+        el('text', { x: 10, y: c.y - 22, class: 'lbl', 'font-size': 12.5, fill: '#6b6b74' }, svg).textContent = c.name;
+        el('text', { x: x0 + W + 16, y: c.y + 5, class: 'lbl', 'font-size': 13, fill: '#155e75' }, svg).textContent = c.f;
+        // опоры
+        if (c.name.startsWith('шарнир')) el('path', { d: `M ${x0} ${c.y} l -8 14 l 16 0 z`, fill: '#fff', stroke: '#16161a', 'stroke-width': 1.3 }, svg);
+        else el('rect', { x: x0 - 10, y: c.y - 16, width: 10, height: 32, fill: '#d6d3ca', stroke: '#16161a', 'stroke-width': 1.2 }, svg);
+        if (c.name.endsWith('шарнир')) el('path', { d: `M ${x0 + W} ${c.y} l -8 14 l 16 0 z`, fill: '#fff', stroke: '#16161a', 'stroke-width': 1.3 }, svg);
+        else el('rect', { x: x0 + W, y: c.y - 16, width: 10, height: 32, fill: '#d6d3ca', stroke: '#16161a', 'stroke-width': 1.2 }, svg);
+        return { c, path: el('polyline', { fill: 'none', stroke: '#155e75', 'stroke-width': 2.2 }, svg) };
+      });
+      V.loop((dt, t) => {
+        for (const { c, path } of lines) {
+          const pts = [];
+          for (let i = 0; i <= 60; i++) {
+            const u = i / 60;
+            let shape;
+            if (c.name === 'шарнир — шарнир') shape = Math.sin(Math.PI * u);
+            else if (c.name === 'заделка — шарнир') shape = Math.sin(Math.PI * u) * (1 - u) * 2.2;
+            else shape = (1 - Math.cos(2 * Math.PI * u)) / 2;
+            pts.push(`${(x0 + W * u).toFixed(1)},${(c.y - 22 * shape * Math.sin(2 * Math.PI * 0.7 * c.k * t)).toFixed(1)}`);
+          }
+          path.setAttribute('points', pts.join(' '));
+        }
+      });
+    }
+  }
+
 })();
 </script>
 </body>
