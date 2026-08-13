@@ -255,3 +255,13 @@ table.norm .muted{font-weight:400;font-size:12.5px}
 table.norm.small-t{font-size:13px}
 table.norm.small-t th,table.norm.small-t td{padding:4px 7px;text-align:right}
 table.norm.small-t th{text-align:left;white-space:nowrap}
+
+/* мобильная защита от горизонтального переполнения */
+main table { display: block; max-width: 100%; overflow-x: auto; }
+.katex-display { overflow-x: auto; overflow-y: hidden; padding: 2px 0 6px; }
+.katex-mathml { position: absolute; clip: rect(1px,1px,1px,1px); width: 1px; height: 1px; overflow: hidden; }
+svg.geo-board { max-width: 100%; height: auto; }
+.controls label { max-width: 100%; flex-wrap: wrap; }
+.controls select, .controls input[type=number] { max-width: 100%; }
+main .readout, main .caption, main .small { overflow-wrap: anywhere; }
+main .note div, main .note span, main .steps div, main .out div { overflow-wrap: anywhere; }
