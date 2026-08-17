@@ -336,7 +336,7 @@
     }
     V.el('polyline', { points: p1.join(' '), fill: 'none', stroke: '#155e75', 'stroke-width': 2.2 }, svg);
     V.el('circle', { cx: X(1), cy: Y(0), r: 5, fill: '#1a7f37' }, svg);
-    V.el('text', { x: X(1) + 8, y: Y(0) - 10, class: 'lbl', fill: '#1a7f37', 'font-size': 13.5 }, svg).textContent = 'a₁ = 0: настройка c₂/m₂ = ω²';
+    V.el('text', { x: X(1), y: y0 + h + 36, 'text-anchor': 'middle', class: 'lbl', fill: '#1a7f37', 'font-size': 13.5 }, svg).textContent = 'a₁ = 0: настройка c₂/m₂ = ω²';
     V.el('text', { x: X(0.62), y: Y(4.6), class: 'lbl', fill: '#155e75', 'font-size': 13 }, svg).textContent = 'новые резонансы';
     V.el('text', { x: X(1.24), y: Y(4.6), class: 'lbl', fill: '#155e75', 'font-size': 13 }, svg).textContent = ' ';
     V.el('text', { x: X(0.30), y: Y(1.7), class: 'lbl', fill: '#6b6b74', 'font-size': 13 }, svg).textContent = 'без гасителя';

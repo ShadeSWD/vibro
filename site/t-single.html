@@ -319,7 +319,7 @@
     [0, 1].forEach((i) => {
       const t = i * Tp, q = Math.exp(-mu1 * t);
       V.el('line', { x1: X(t), y1: y0, x2: X(t), y2: Y(q), stroke: '#b3382e', 'stroke-width': 1.6 }, svg);
-      V.el('text', { x: X(t) + 5, y: Y(q) - 5, class: 'lbl', fill: '#b3382e', 'font-size': 13 }, svg).textContent = 'a' + (i + 1);
+      V.el('text', { x: X(t) + (i ? 5 : 22), y: Y(q) - 5, class: 'lbl', fill: '#b3382e', 'font-size': 13 }, svg).textContent = 'a' + (i + 1);
     });
     V.el('text', { x: X(2.2), y: Y(0.92), class: 'lbl', fill: '#6b6b74', 'font-size': 13 }, svg).textContent = '±A·e^(−μt)';
     // апериодическая
@@ -332,7 +332,7 @@
         pts.push(`${X(t).toFixed(1)},${Y(C1 * Math.exp(k1 * t) + C2 * Math.exp(k2 * t)).toFixed(1)}`);
       }
       V.el('polyline', { points: pts.join(' '), fill: 'none', stroke: '#1a7f37', 'stroke-width': 2.2 }, svg);
-      V.el('text', { x: X(1.7), y: Y(0.28), class: 'lbl', fill: '#1a7f37', 'font-size': 13.5 }, svg).textContent = 'μ > λ: апериодическое';
+      V.el('text', { x: X(2.2), y: Y(0.28), class: 'lbl', fill: '#1a7f37', 'font-size': 13.5 }, svg).textContent = 'μ > λ: апериодическое';
     }
     V.el('text', { x: X(6.2), y: Y(-0.55), class: 'lbl', fill: '#155e75', 'font-size': 13.5 }, svg).textContent = 'μ < λ: затухающие колебания';
   }
@@ -366,8 +366,10 @@
     }
     V.el('polyline', { points: pts.join(' '), fill: 'none', stroke: '#155e75', 'stroke-width': 2.6 }, svg);
     V.el('line', { x1: X(0.5), y1: Y(2), x2: X(0.5), y2: y0 + h, stroke: '#9a9aa2', 'stroke-dasharray': '5 4' }, svg);
-    V.el('text', { x: X(0.52), y: Y(2) - 8, class: 'lbl', fill: '#155e75', 'font-size': 13 }, svg)
-      .textContent = 'плато α = 2: удар «медленный», как внезапная статическая нагрузка';
+    V.el('text', { x: X(0.55), y: Y(2) + 20, class: 'lbl', fill: '#155e75', 'font-size': 13 }, svg)
+      .textContent = 'плато α = 2: удар «медленный»,';
+    V.el('text', { x: X(0.55), y: Y(2) + 36, class: 'lbl', fill: '#155e75', 'font-size': 13 }, svg)
+      .textContent = 'как внезапная статическая нагрузка';
     // отметки примеров
     [[0.066, 0.4117, 'корпус, 1,32 Гц', '#b3382e', 1],
      [2.5, 2, 'настил, 50 Гц', '#1a7f37', -1]].forEach(([r, a, name, col, s]) => {

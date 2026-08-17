@@ -247,7 +247,7 @@
     curve((r) => 1 + 1 / (r * r), '#155e75', 2.6);
     curve((r) => (1 + 4 / (r * r)) / (1 + 1 / (r * r)), '#b3382e', 2.2);
     V.el('line', { x1: x0, y1: Y(1), x2: x0 + w, y2: Y(1), stroke: '#9a9aa2', 'stroke-dasharray': '5 4' }, svg);
-    V.el('text', { x: X(2.92), y: Y(1) + 16, 'text-anchor': 'end', class: 'lbl', fill: '#6b6b74', 'font-size': 12.5 }, svg)
+    V.el('text', { x: X(1.12), y: Y(1) - 8, class: 'lbl', fill: '#6b6b74', 'font-size': 12.5 }, svg)
       .textContent = 'предел балки-полоски';
     V.el('text', { x: X(1.12), y: Y(1.92), class: 'lbl', fill: '#155e75', 'font-size': 13.5 }, svg)
       .textContent = 'K — множитель частоты';

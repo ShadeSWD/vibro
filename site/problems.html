@@ -941,7 +941,7 @@
       el('line', { x1: X(f), y1: y - 5, x2: X(f), y2: y + 5, stroke: '#16161a' }, svg);
       el('text', { x: X(f), y: y + 22, 'text-anchor': 'middle', class: 'lbl-axis', 'font-size': 12 }, svg).textContent = f;
     }
-    el('text', { x: x0 + w, y: y + 42, 'text-anchor': 'end', class: 'lbl-axis' }, svg).textContent = 'f, Гц';
+    el('text', { x: x0 + w, y: y - 12, 'text-anchor': 'end', class: 'lbl-axis' }, svg).textContent = 'f, Гц';
     [[1.6, 'f₁'], [3.3, 'f₂'], [5.2, 'f₃'], [7.0, 'f₄']].forEach(([f, n]) => {
       el('line', { x1: X(f), y1: y, x2: X(f), y2: y - 44, stroke: '#155e75', 'stroke-width': 2.4 }, svg);
       el('text', { x: X(f), y: y - 50, 'text-anchor': 'middle', class: 'lbl', fill: '#155e75', 'font-size': 13 }, svg).textContent = n;
@@ -980,7 +980,7 @@
     });
     el('line', { x1: X(0), y1: y0 + 74, x2: X(5 * T), y2: y0 + 74, class: 'ln-dim', stroke: '#16161a' }, svg);
     el('text', { x: X(2.5 * T), y: y0 + 68, 'text-anchor': 'middle', class: 'lbl-dim' }, svg).textContent = "5 T′ = 1,25 с";
-    el('text', { x: x0 + 6, y: y0 - 76, class: 'lbl', 'font-size': 13, fill: '#6b6b74' }, svg).textContent = 'q, мм';
+    el('text', { x: x0, y: y0 - 102, class: 'lbl', 'font-size': 13, fill: '#6b6b74' }, svg).textContent = 'q, мм';
     el('text', { x: x0 + w - 8, y: y0 + 100, 'text-anchor': 'end', class: 'lbl-axis' }, svg).textContent = 't, с';
     el('text', { x: X(0.75), y: Y(-9.4), class: 'lbl', 'font-size': 13, fill: '#6b6b74' }, svg).textContent = 'огибающая ±a₁e^(−μt)';
   }
@@ -1449,9 +1449,9 @@
       el('line', { x1: x0, y1: yc - A, x2: x0 + W, y2: yc - A, stroke: '#6b6b74', 'stroke-width': 1, 'stroke-dasharray': '4 4' }, svg);
       el('line', { x1: x0, y1: yc - A / Math.SQRT2, x2: x0 + W, y2: yc - A / Math.SQRT2,
                    stroke: '#1a7f37', 'stroke-width': 1.2, 'stroke-dasharray': '6 4' }, svg);
-      el('text', { x: x0 + W + 6, y: yc - A + 4, class: 'lbl', 'font-size': 11.5, fill: '#6b6b74' }, svg)
+      el('text', { x: x0 + W + 6, y: yc - A + 8, class: 'lbl', 'font-size': 11.5, fill: '#6b6b74' }, svg)
         .textContent = 'амплитуда';
-      el('text', { x: x0 + W + 6, y: yc - A / Math.SQRT2 + 4, class: 'lbl', 'font-size': 11.5, fill: '#1a7f37' }, svg)
+      el('text', { x: x0 + W + 6, y: yc - A / Math.SQRT2 + 20, class: 'lbl', 'font-size': 11.5, fill: '#1a7f37' }, svg)
         .textContent = 'СКЗ = ампл./√2';
       el('text', { x: x0 - 44, y: yc - A - 26, class: 'lbl', 'font-size': 12, fill: '#16161a' }, svg)
         .textContent = 'перемещение настила, f = 8 Гц';
@@ -1472,7 +1472,7 @@
                      fill: 'rgba(179,56,46,.18)', stroke: '#b3382e', 'stroke-width': 1.6 }, svg);
         el('line', { x1: b.x - 12, y1: by - hLim, x2: b.x + bw + 12, y2: by - hLim,
                      stroke: '#1a7f37', 'stroke-width': 2 }, svg);
-        el('text', { x: b.x + bw / 2, y: by - hVal - 8, class: 'lbl', 'font-size': 11.5,
+        el('text', { x: b.x + bw / 2, y: by - hVal + 38, class: 'lbl', 'font-size': 11.5,
                      fill: '#b3382e', 'text-anchor': 'middle' }, svg)
           .textContent = b.val + ' ' + b.unit;
         el('text', { x: b.x + bw + 16, y: by - hLim + 4, class: 'lbl', 'font-size': 11.5, fill: '#1a7f37' }, svg)
