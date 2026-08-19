@@ -189,10 +189,14 @@
   let wheelAngle = 0;
   function drawScene() {
     // дорога
-    const ptsL = [], sFrom = st.x - 4.6, sTo = st.x + 13.2;
-    for (let i = 0; i <= 140; i++) {
-      const s = sFrom + (sTo - sFrom) * i / 140;
-      ptsL.push(`${(XREAR + (s - st.x) * S).toFixed(1)},${(YG - roadAt(s) * SV).toFixed(1)}`);
+    /* дорогу строим по ЭКРАНУ, от края до края: если задавать диапазон в
+       метрах, полотно не доходит до левой рамки и вылезает за правую, а
+       заливка замыкается наискось — получаются косые срезы по краям */
+    const ptsL = [];
+    for (let i = 0; i <= 160; i++) {
+      const px = 960 * i / 160;
+      const s = st.x + (px - XREAR) / S;
+      ptsL.push(`${px.toFixed(1)},${(YG - roadAt(s) * SV).toFixed(1)}`);
     }
     roadLine.setAttribute('points', ptsL.join(' '));
     roadFill.setAttribute('d', `M${ptsL.join(' L')} L960,360 L0,360 Z`);
